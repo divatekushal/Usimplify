@@ -1,0 +1,556 @@
+{% extends "base.html" %}
+
+{% block title %}Bank Management - FinanceFlow{% endblock %}
+{% block page_title %}Bank Management{% endblock %}
+{% block page_subtitle %}Manage your bank accounts and transactions{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bank-card {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bank-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .bank-card:hover::before {
+        left: 100%;
+    }
+    
+    .bank-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+    
+    .bank-card.selected {
+        border-color: #3b82f6;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        transform: translateY(-4px);
+    }
+    
+    .bank-logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        text-transform: uppercase;
+        font-size: 1.2rem;
+    }
+    
+    .details-container {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease;
+        pointer-events: none;
+    }
+    
+    .details-container.show {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+    }
+    
+    .statement-file {
+        transition: all 0.3s ease;
+        border: 2px solid #e5e7eb;
+    }
+    
+    .statement-file:hover {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+    
+    .query-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        color: white;
+    }
+    
+    .animate-fade-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .pulse-dot {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+    
+    .download-btn {
+        transition: all 0.3s ease;
+    }
+    
+    .download-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="p-4 space-y-6">
+    <!-- Bank Cards Selection -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- HDFC Bank Card -->
+        <div class="bank-card card-compact p-6" onclick="selectBank('hdfc')" id="hdfc-card">
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="bank-logo" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+                    H
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-lg">HDFC Bank</h3>
+                    <p class="text-xs text-gray-500">Private Banking</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Accounts</span>
+                    <span class="font-bold text-blue-600 text-xl">3</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Total Balance</span>
+                    <span class="font-bold text-green-600">₹45.2L</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-3">
+                    <div class="bg-blue-600 h-1.5 rounded-full" style="width: 75%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ICICI Bank Card -->
+        <div class="bank-card card-compact p-6" onclick="selectBank('icici')" id="icici-card">
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="bank-logo" style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);">
+                    I
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-lg">ICICI Bank</h3>
+                    <p class="text-xs text-gray-500">Commercial Banking</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Accounts</span>
+                    <span class="font-bold text-red-600 text-xl">2</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Total Balance</span>
+                    <span class="font-bold text-green-600">₹28.8L</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-3">
+                    <div class="bg-red-600 h-1.5 rounded-full" style="width: 60%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SBI Bank Card -->
+        <div class="bank-card card-compact p-6" onclick="selectBank('sbi')" id="sbi-card">
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="bank-logo" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                    S
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-lg">SBI Bank</h3>
+                    <p class="text-xs text-gray-500">Government Banking</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Accounts</span>
+                    <span class="font-bold text-green-600 text-xl">1</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Total Balance</span>
+                    <span class="font-bold text-green-600">₹15.6L</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-3">
+                    <div class="bg-green-600 h-1.5 rounded-full" style="width: 45%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Axis Bank Card -->
+        <div class="bank-card card-compact p-6" onclick="selectBank('axis')" id="axis-card">
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="bank-logo" style="background: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%);">
+                    A
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-lg">Axis Bank</h3>
+                    <p class="text-xs text-gray-500">Business Banking</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Accounts</span>
+                    <span class="font-bold text-orange-600 text-xl">2</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Total Balance</span>
+                    <span class="font-bold text-green-600">₹32.4L</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-3">
+                    <div class="bg-orange-600 h-1.5 rounded-full" style="width: 65%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Selection Instruction -->
+    <div class="text-center py-4" id="selection-hint">
+        <p class="text-gray-500 text-lg">
+            <i class="fas fa-hand-pointer mr-2 text-blue-500 animate-bounce"></i>
+            Select any bank above to view detailed information
+        </p>
+    </div>
+    
+    <!-- Bank Details Container -->
+    <div class="details-container" id="bank-details">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Account Details -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Account Balance & Info -->
+                <div class="card-compact p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div id="selected-bank-logo" class="bank-logo"></div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800" id="selected-bank-name">Bank Name</h3>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full pulse-dot"></div>
+                                    <span class="text-sm text-gray-500">Live Balance</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-3xl font-bold text-green-600" id="account-balance">₹0</p>
+                            <p class="text-xs text-gray-500">
+                                Last updated: <span id="last-updated">--</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Types -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="account-types">
+                        <!-- Dynamic account types will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Bank Statements -->
+                <div class="card-compact p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">
+                            <i class="fas fa-file-alt mr-2 text-blue-500"></i>
+                            Bank Statements
+                        </h3>
+                        <span class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
+                            Last 6 months
+                        </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="bank-statements">
+                        <!-- Dynamic statements will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Query Box -->
+            <div class="lg:col-span-1">
+                <div class="query-box p-6 sticky top-6">
+                    <div class="text-center mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-comments text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Contact Accountant</h3>
+                        <p class="text-white text-opacity-80 text-sm mt-1">Have questions about this bank account?</p>
+                    </div>
+                    
+                    <form class="space-y-4" onsubmit="sendQuery(event)">
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">Subject</label>
+                            <input type="text" 
+                                   class="w-full px-4 py-3 rounded-lg border-0 text-gray-800 focus:ring-2 focus:ring-white focus:ring-opacity-50 outline-none"
+                                   placeholder="Enter subject..."
+                                   required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">Your Query</label>
+                            <textarea rows="4" 
+                                      class="w-full px-4 py-3 rounded-lg border-0 text-gray-800 focus:ring-2 focus:ring-white focus:ring-opacity-50 outline-none resize-none"
+                                      placeholder="Describe your query in detail..."
+                                      required></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">Priority</label>
+                            <select class="w-full px-4 py-3 rounded-lg border-0 text-gray-800 focus:ring-2 focus:ring-white focus:ring-opacity-50 outline-none">
+                                <option value="normal">Normal</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-white text-purple-600 font-semibold py-3 px-4 rounded-lg hover:bg-opacity-90 transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Send Query
+                        </button>
+                        
+                        <div class="text-center">
+                            <p class="text-white text-opacity-80 text-xs">
+                                <i class="fas fa-clock mr-1"></i>
+                                Expected response within 2 hours
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let selectedBank = null;
+    
+    const bankData = {
+        hdfc: {
+            name: 'HDFC Bank',
+            logo: { background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)', letter: 'H' },
+            balance: '₹45,20,000',
+            lastUpdated: 'Aug 20, 2025 3:45 PM',
+            accounts: [
+                { type: 'Current Account', number: '****2847', balance: '₹32,00,000' },
+                { type: 'Savings Account', number: '****1923', balance: '₹8,50,000' },
+                { type: 'Fixed Deposit', number: '****7341', balance: '₹4,70,000' }
+            ],
+            statements: [
+                { month: 'August 2025', date: '20 Aug 2025', size: '2.4 MB', type: 'Current' },
+                { month: 'July 2025', date: '31 Jul 2025', size: '3.1 MB', type: 'Current' },
+                { month: 'June 2025', date: '30 Jun 2025', size: '2.8 MB', type: 'Savings' },
+                { month: 'May 2025', date: '31 May 2025', size: '3.5 MB', type: 'Current' }
+            ]
+        },
+        icici: {
+            name: 'ICICI Bank',
+            logo: { background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)', letter: 'I' },
+            balance: '₹28,80,000',
+            lastUpdated: 'Aug 20, 2025 2:30 PM',
+            accounts: [
+                { type: 'Business Account', number: '****5692', balance: '₹18,30,000' },
+                { type: 'Salary Account', number: '****8174', balance: '₹10,50,000' }
+            ],
+            statements: [
+                { month: 'August 2025', date: '20 Aug 2025', size: '1.9 MB', type: 'Business' },
+                { month: 'July 2025', date: '31 Jul 2025', size: '2.2 MB', type: 'Business' },
+                { month: 'June 2025', date: '30 Jun 2025', size: '1.7 MB', type: 'Salary' },
+                { month: 'May 2025', date: '31 May 2025', size: '2.4 MB', type: 'Business' }
+            ]
+        },
+        sbi: {
+            name: 'SBI Bank',
+            logo: { background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', letter: 'S' },
+            balance: '₹15,60,000',
+            lastUpdated: 'Aug 20, 2025 1:15 PM',
+            accounts: [
+                { type: 'Corporate Account', number: '****3456', balance: '₹15,60,000' }
+            ],
+            statements: [
+                { month: 'August 2025', date: '20 Aug 2025', size: '1.2 MB', type: 'Corporate' },
+                { month: 'July 2025', date: '31 Jul 2025', size: '1.4 MB', type: 'Corporate' },
+                { month: 'June 2025', date: '30 Jun 2025', size: '1.1 MB', type: 'Corporate' },
+                { month: 'May 2025', date: '31 May 2025', size: '1.6 MB', type: 'Corporate' }
+            ]
+        },
+        axis: {
+            name: 'Axis Bank',
+            logo: { background: 'linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)', letter: 'A' },
+            balance: '₹32,40,000',
+            lastUpdated: 'Aug 20, 2025 4:00 PM',
+            accounts: [
+                { type: 'Premium Account', number: '****9821', balance: '₹22,10,000' },
+                { type: 'Trade Account', number: '****7634', balance: '₹10,30,000' }
+            ],
+            statements: [
+                { month: 'August 2025', date: '20 Aug 2025', size: '2.7 MB', type: 'Premium' },
+                { month: 'July 2025', date: '31 Jul 2025', size: '3.2 MB', type: 'Premium' },
+                { month: 'June 2025', date: '30 Jun 2025', size: '2.1 MB', type: 'Trade' },
+                { month: 'May 2025', date: '31 May 2025', size: '2.9 MB', type: 'Premium' }
+            ]
+        }
+    };
+    
+    function selectBank(bankId) {
+        // Remove selection from all cards
+        document.querySelectorAll('.bank-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Add selection to clicked card
+        document.getElementById(bankId + '-card').classList.add('selected');
+        
+        selectedBank = bankId;
+        const bank = bankData[bankId];
+        
+        // Hide selection hint
+        document.getElementById('selection-hint').style.display = 'none';
+        
+        // Update bank details
+        document.getElementById('selected-bank-name').textContent = bank.name;
+        document.getElementById('account-balance').textContent = bank.balance;
+        document.getElementById('last-updated').textContent = bank.lastUpdated;
+        
+        // Update bank logo
+        const logoElement = document.getElementById('selected-bank-logo');
+        logoElement.style.background = bank.logo.background;
+        logoElement.textContent = bank.logo.letter;
+        
+        // Update account types
+        const accountTypesContainer = document.getElementById('account-types');
+        accountTypesContainer.innerHTML = bank.accounts.map(account => `
+            <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg border border-gray-200">
+                <h4 class="font-semibold text-gray-800 text-sm">${account.type}</h4>
+                <p class="text-xs text-gray-500 mt-1">${account.number}</p>
+                <p class="font-bold text-green-600 text-lg mt-2">${account.balance}</p>
+            </div>
+        `).join('');
+        
+        // Update bank statements
+        const statementsContainer = document.getElementById('bank-statements');
+        statementsContainer.innerHTML = bank.statements.map(statement => `
+            <div class="statement-file p-4 rounded-lg cursor-pointer" onclick="downloadStatement('${statement.month}', '${bankId}')">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-file-pdf text-blue-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-800 text-sm">${statement.month}</h4>
+                        <p class="text-xs text-gray-500">${statement.type} • ${statement.size}</p>
+                        <p class="text-xs text-gray-400">Generated: ${statement.date}</p>
+                    </div>
+                    <div class="download-btn w-8 h-8 bg-green-500 rounded-full flex items-center justify-center hover:bg-green-600">
+                        <i class="fas fa-download text-white text-xs"></i>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        // Show details container with animation
+        const detailsContainer = document.getElementById('bank-details');
+        setTimeout(() => {
+            detailsContainer.classList.add('show');
+        }, 100);
+    }
+    
+    function downloadStatement(month, bankId) {
+        // Simulate file download
+        const link = document.createElement('a');
+        link.href = '#';
+        link.download = `${bankData[bankId].name}_Statement_${month.replace(' ', '_')}.pdf`;
+        
+        // Show download feedback
+        const downloadBtn = event.target.closest('.statement-file');
+        const originalContent = downloadBtn.innerHTML;
+        
+        downloadBtn.innerHTML = `
+            <div class="flex items-center justify-center space-x-2 text-green-600">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span class="text-sm font-medium">Downloading...</span>
+            </div>
+        `;
+        
+        setTimeout(() => {
+            downloadBtn.innerHTML = `
+                <div class="flex items-center justify-center space-x-2 text-green-600">
+                    <i class="fas fa-check"></i>
+                    <span class="text-sm font-medium">Downloaded Successfully!</span>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalContent;
+            }, 2000);
+        }, 1500);
+    }
+    
+    function sendQuery(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalContent = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+        submitBtn.disabled = true;
+        
+        // Simulate API call
+        setTimeout(() => {
+            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Query Sent Successfully!';
+            
+            setTimeout(() => {
+                submitBtn.innerHTML = originalContent;
+                submitBtn.disabled = false;
+                form.reset();
+                
+                // Show success message
+                alert('Your query has been sent to the accountant. You will receive a response within 2 hours.');
+            }, 2000);
+        }, 1500);
+    }
+    
+    // Add entrance animations
+    document.addEventListener('DOMContentLoaded', function() {
+        const bankCards = document.querySelectorAll('.bank-card');
+        bankCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 150);
+        });
+    });
+</script>
+{% endblock %}

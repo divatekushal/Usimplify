@@ -1,0 +1,1895 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>FinanceFlow - Advanced Financial Management Platform</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+            
+            * {
+                font-family: 'Inter', sans-serif;
+            }
+            
+            .font-poppins {
+                font-family: 'Poppins', sans-serif;
+            }
+            
+            .hero-gradient {
+                background: linear-gradient(135deg, #1e293b 0%, #334155 25%, #475569 50%, #64748b 75%, #94a3b8 100%);
+                position: relative;
+            }
+            
+            .hero-gradient::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: 
+                    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+            }
+            
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            
+            .card-premium {
+                background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+                box-shadow: 
+                    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                border: 1px solid rgba(226, 232, 240, 0.8);
+            }
+            
+            .btn-primary {
+                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+            }
+            
+            .feature-card {
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 1px solid transparent;
+            }
+            
+            .feature-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                border-color: rgba(59, 130, 246, 0.2);
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            }
+            
+            .card-hover {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            }
+            
+            .stats-animation {
+                animation: countUp 2s ease-out forwards;
+            }
+            
+            .text-gradient {
+                background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            
+            .workflow-line {
+                background: linear-gradient(90deg, #e2e8f0 0%, #3b82f6 50%, #e2e8f0 100%);
+                height: 2px;
+                position: relative;
+            }
+            
+            .workflow-line::after {
+                content: '';
+                position: absolute;
+                right: 0;
+                top: -3px;
+                width: 8px;
+                height: 8px;
+                background: #3b82f6;
+                border-radius: 50%;
+            }
+            
+            .nav-blur {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            }
+            
+            .section-divider {
+                background: linear-gradient(90deg, transparent 0%, #e2e8f0 20%, #3b82f6 50%, #e2e8f0 80%, transparent 100%);
+                height: 1px;
+                margin: 4rem 0;
+            }
+        </style>
+    </head>
+    <body class="bg-slate-50 text-slate-800">
+
+        <!-- Navigation -->
+        <nav class="fixed w-full top-0 z-50 nav-blur">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-infinity text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold font-poppins text-slate-800">FinanceFlow</h1>
+                            <p class="text-xs text-slate-500 -mt-1">Professional Suite</p>
+                        </div>
+                    </div>
+                    
+                    <div class="hidden lg:flex items-center space-x-8">
+                        <a href="#platform" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Platform</a>
+                        <a href="#solutions" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Solutions</a>
+                        <a href="#enterprise" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Enterprise</a>
+                        <a href="#resources" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Resources</a>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <button class="text-slate-600 hover:text-blue-600 font-medium transition-colors">
+                            Sign In
+                        </button>
+                        <button class="btn-primary text-white px-6 py-2.5 rounded-xl font-medium">
+                            Start Trial
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero-gradient pt-24 pb-20 relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- Left Content -->
+                    <div class="lg:col-span-6 text-white">
+                        <div class="inline-flex items-center px-4 py-2 rounded-full glass-effect text-sm font-medium mb-8">
+                            <div class="w-2 h-2 bg-green-400 rounded-full mr-3 animate-pulse"></div>
+                            Enterprise-Grade Financial Intelligence
+                        </div>
+                        
+                        <h1 class="font-poppins text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                            Transform Financial
+                            <span class="block text-gradient">Operations</span>
+                            <span class="block text-slate-300">with Intelligence</span>
+                        </h1>
+                        
+                        <p class="text-xl text-slate-300 mb-8 max-w-lg leading-relaxed">
+                            Automate bill processing, streamline verification workflows, and unlock actionable insights 
+                            across multiple companies with our AI-powered platform.
+                        </p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                            <button class="btn-primary text-white px-8 py-4 rounded-xl font-semibold flex items-center justify-center group">
+                                <span>Start Free Trial</span>
+                                <i class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                            <button class="glass-effect text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center">
+                                <i class="fas fa-play mr-3"></i>
+                                Watch Demo
+                            </button>
+                        </div>
+                        
+                        <!-- Trust Indicators -->
+                        <div class="flex items-center space-x-8 text-sm">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-shield-check text-green-400"></i>
+                                <span class="text-slate-300">SOC 2 Compliant</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-lock text-blue-400"></i>
+                                <span class="text-slate-300">256-bit Encryption</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-award text-yellow-400"></i>
+                                <span class="text-slate-300">99.9% Uptime</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Content - Advanced Dashboard -->
+                    <div class="lg:col-span-6 relative">
+                        <div class="relative">
+                            <!-- Main Dashboard Window -->
+                            <div class="card-premium rounded-2xl overflow-hidden shadow-2xl">
+                                <!-- Window Controls -->
+                                <div class="bg-slate-100 px-6 py-4 flex items-center justify-between border-b">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                                        <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                                        <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                                    </div>
+                                    <div class="text-sm text-slate-500 font-medium">app.financeflow.com</div>
+                                    <div class="w-6"></div>
+                                </div>
+                                
+                                <!-- Dashboard Content -->
+                                <div class="p-6 bg-white">
+                                    <!-- Header -->
+                                    <div class="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h3 class="text-xl font-bold text-slate-800">Financial Dashboard</h3>
+                                            <p class="text-slate-500 text-sm">Multi-company overview</p>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                                                <i class="fas fa-circle text-green-500 mr-2 text-xs"></i>
+                                                Live
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- KPI Cards -->
+                                    <div class="grid grid-cols-3 gap-4 mb-6">
+                                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <p class="text-blue-600 text-sm font-medium">Processed</p>
+                                                    <p class="text-2xl font-bold text-blue-800">2,847</p>
+                                                </div>
+                                                <i class="fas fa-file-invoice text-blue-500 text-xl"></i>
+                                            </div>
+                                        </div>
+                                        <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <p class="text-green-600 text-sm font-medium">Accuracy</p>
+                                                    <p class="text-2xl font-bold text-green-800">99.8%</p>
+                                                </div>
+                                                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                                            </div>
+                                        </div>
+                                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <p class="text-purple-600 text-sm font-medium">Time Saved</p>
+                                                    <p class="text-2xl font-bold text-purple-800">847h</p>
+                                                </div>
+                                                <i class="fas fa-clock text-purple-500 text-xl"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Recent Activity -->
+                                    <div class="space-y-3">
+                                        <h4 class="font-semibold text-slate-700 text-sm">Recent Activity</h4>
+                                        <div class="space-y-2">
+                                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                        <i class="fas fa-upload text-blue-600 text-xs"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-slate-800">Invoice #INV-2847 processed</p>
+                                                        <p class="text-xs text-slate-500">Acme Corp • 2 min ago</p>
+                                                    </div>
+                                                </div>
+                                                <div class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Verified</div>
+                                            </div>
+                                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                                        <i class="fas fa-eye text-orange-600 text-xs"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-slate-800">Receipt verification pending</p>
+                                                        <p class="text-xs text-slate-500">Tech Solutions • 5 min ago</p>
+                                                    </div>
+                                                </div>
+                                                <div class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs">Pending</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Floating Elements -->
+                            <div class="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
+                                <i class="fas fa-chart-line text-white text-2xl"></i>
+                            </div>
+                            
+                            <div class="absolute -bottom-6 -left-6 w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="fas fa-shield-check text-white text-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="py-8 bg-white relative">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="grid md:grid-cols-4 gap-8 text-center">
+                    <div class="group">
+                        <div class="text-4xl font-bold text-slate-800 mb-2 stats-animation">500+</div>
+                        <div class="text-slate-600 font-medium">Enterprise Clients</div>
+                        <div class="text-sm text-slate-400 mt-1">Trusted globally</div>
+                    </div>
+                    <div class="group">
+                        <div class="text-4xl font-bold text-slate-800 mb-2 stats-animation">10M+</div>
+                        <div class="text-slate-600 font-medium">Documents Processed</div>
+                        <div class="text-sm text-slate-400 mt-1">Monthly volume</div>
+                    </div>
+                    <div class="group">
+                        <div class="text-4xl font-bold text-slate-800 mb-2 stats-animation">99.8%</div>
+                        <div class="text-slate-600 font-medium">Accuracy Rate</div>
+                        <div class="text-sm text-slate-400 mt-1">AI-powered precision</div>
+                    </div>
+                    <div class="group">
+                        <div class="text-4xl font-bold text-slate-800 mb-2 stats-animation">24/7</div>
+                        <div class="text-slate-600 font-medium">Processing Uptime</div>
+                        <div class="text-sm text-slate-400 mt-1">Enterprise support</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Features Section -->
+        <section id="platform" class="py-8 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <!-- Section Header -->
+                <div class="text-center mb-16">
+                    <div class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-6">
+                        <i class="fas fa-cog mr-2"></i>
+                        Platform Features
+                    </div>
+                    <h2 class="font-poppins text-4xl lg:text-5xl font-bold text-slate-800 mb-6">
+                        Built for Modern
+                        <span class="text-gradient">Financial Teams</span>
+                    </h2>
+                    <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+                        Comprehensive tools designed for enterprise-level financial operations, 
+                        from automated processing to advanced analytics.
+                    </p>
+                </div>
+                
+                <!-- Features Grid -->
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="feature-card card-premium p-8 rounded-2xl group">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-brain text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 font-poppins">AI Document Processing</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            Advanced machine learning algorithms extract and structure data from invoices, receipts, 
+                            and financial documents with industry-leading accuracy.
+                        </p>
+                        <div class="flex items-center text-blue-600 font-semibold group-hover:translate-x-2 transition-transform">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 2 -->
+                    <div class="feature-card card-premium p-8 rounded-2xl group">
+                        <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-user-check text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 font-poppins">Smart Verification</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            Dual-pane verification interface allows accountants to review and validate 
+                            extracted data efficiently while maintaining complete audit trails.
+                        </p>
+                        <div class="flex items-center text-green-600 font-semibold group-hover:translate-x-2 transition-transform">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 3 -->
+                    <div class="feature-card card-premium p-8 rounded-2xl group">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-chart-pie text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 font-poppins">Advanced Analytics</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            Comprehensive dashboards provide real-time insights across multiple companies 
+                            with customizable reports and predictive analytics.
+                        </p>
+                        <div class="flex items-center text-purple-600 font-semibold group-hover:translate-x-2 transition-transform">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 4 -->
+                    <div class="feature-card card-premium p-8 rounded-2xl group">
+                        <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-building text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 font-poppins">Multi-Entity Management</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            Seamlessly manage financial operations across multiple companies with 
+                            role-based access controls and isolated data environments.
+                        </p>
+                        <div class="flex items-center text-orange-600 font-semibold group-hover:translate-x-2 transition-transform">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 5 -->
+                    <div class="feature-card card-premium p-8 rounded-2xl group">
+                        <div class="w-16 h-16 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-shield-alt text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 font-poppins">Enterprise Security</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            Bank-grade security with end-to-end encryption, SOC 2 compliance, 
+                            and comprehensive audit logging for enterprise peace of mind.
+                        </p>
+                        <div class="flex items-center text-teal-600 font-semibold group-hover:translate-x-2 transition-transform">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 6 -->
+                    <div class="feature-card card-premium p-8 rounded-2xl group">
+                        <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-cogs text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 font-poppins">API Integration</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">
+                            RESTful APIs and webhooks enable seamless integration with existing 
+                            accounting software, ERP systems, and business workflows.
+                        </p>
+                        <div class="flex items-center text-red-600 font-semibold group-hover:translate-x-2 transition-transform">
+                            <span>Learn More</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Professional Testimonials & Stats Section -->
+        <section class="py-8 bg-gradient-to-br from-slate-50 to-slate-100">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <div class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-6">
+                        <i class="fas fa-star mr-2"></i>
+                        Client Success Stories
+                    </div>
+                    <h2 class="font-poppins text-4xl lg:text-5xl font-bold text-slate-800 mb-6">
+                        Trusted by Finance
+                        <span class="text-gradient">Professionals</span>
+                    </h2>
+                    <p class="text-xl text-slate-600">
+                        See how leading accounting professionals transform their operations with FinanceFlow.
+                    </p>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                    <!-- Stat 1 -->
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-2xl text-center border border-blue-200 card-hover">
+                        <div class="text-5xl font-bold text-blue-600 mb-3">80%</div>
+                        <div class="text-xl font-semibold text-blue-800 mb-2">Time Saved</div>
+                        <div class="text-sm text-blue-600">On document processing</div>
+                    </div>
+                    
+                    <!-- Stat 2 -->
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-2xl text-center border border-purple-200 card-hover">
+                        <div class="text-5xl font-bold text-purple-600 mb-3">100%</div>
+                        <div class="text-xl font-semibold text-purple-800 mb-2">Accuracy</div>
+                        <div class="text-sm text-purple-600">AI-powered precision</div>
+                    </div>
+                    
+                    <!-- Stat 3 -->
+                    <div class="bg-gradient-to-br from-cyan-50 to-cyan-100 p-8 rounded-2xl text-center border border-cyan-200 card-hover">
+                        <div class="text-5xl font-bold text-cyan-600 mb-3">5X</div>
+                        <div class="text-xl font-semibold text-cyan-800 mb-2">Faster GST Filing</div>
+                        <div class="text-sm text-cyan-600">Streamlined process</div>
+                    </div>
+                    
+                    <!-- Stat 4 -->
+                    <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-8 rounded-2xl text-center border border-indigo-200 card-hover">
+                        <div class="text-5xl font-bold text-indigo-600 mb-3">Zero</div>
+                        <div class="text-xl font-semibold text-indigo-800 mb-2">Duplicate Entries</div>
+                        <div class="text-sm text-indigo-600">Smart detection</div>
+                    </div>
+                </div>
+                
+                <!-- Additional Stats Row -->
+                <div class="grid md:grid-cols-2 gap-6 mb-16">
+                    <!-- Stat 5 -->
+                    <div class="bg-gradient-to-br from-teal-50 to-teal-100 p-8 rounded-2xl text-center border border-teal-200 card-hover">
+                        <div class="text-5xl font-bold text-teal-600 mb-3">50%</div>
+                        <div class="text-xl font-semibold text-teal-800 mb-2">Fewer Follow-ups</div>
+                        <div class="text-sm text-teal-600">Improved client communication</div>
+                    </div>
+                    
+                    <!-- Stat 6 -->
+                    <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 p-8 rounded-2xl text-center border border-emerald-200 card-hover">
+                        <div class="text-5xl font-bold text-emerald-600 mb-3">Seamless</div>
+                        <div class="text-xl font-semibold text-emerald-800 mb-2">Integration</div>
+                        <div class="text-sm text-emerald-600">With existing systems</div>
+                    </div>
+                </div>
+                
+                <!-- Professional Testimonials -->
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Testimonial 1 - Rahul Mehta -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 card-hover">
+                        <div class="flex items-start space-x-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-calculator text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-lg">Rahul Mehta</h4>
+                                <p class="text-blue-600 text-sm font-medium">Chartered Accountant</p>
+                                <div class="flex items-center mt-1">
+                                    <div class="flex space-x-1 text-yellow-400">
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-slate-600 italic leading-relaxed mb-4">
+                            "FinanceFlow has completely transformed how we handle GST filings! Automating document 
+                            collection from WhatsApp and reconciling invoices has saved us countless hours of manual work. 
+                            Now, we focus on scaling our practice rather than chasing clients for data."
+                        </p>
+                        <div class="text-sm text-slate-500">
+                            <i class="fas fa-quote-right text-slate-300"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 2 - Sneha Kulkarni -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 card-hover">
+                        <div class="flex items-start space-x-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-file-invoice text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-lg">Sneha Kulkarni</h4>
+                                <p class="text-orange-600 text-sm font-medium">Tax Consultant</p>
+                                <div class="flex items-center mt-1">
+                                    <div class="flex space-x-1 text-yellow-400">
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-slate-600 italic leading-relaxed mb-4">
+                            "Manual data entry was our biggest headache until we switched to FinanceFlow. Now everything 
+                            from invoice reconciliation to GST filing happens seamlessly, cutting our workload by 80%. 
+                            The integration with Tally and Excel is a game-changer!"
+                        </p>
+                        <div class="text-sm text-slate-500">
+                            <i class="fas fa-quote-right text-slate-300"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 3 - Vikas Sharma -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 card-hover">
+                        <div class="flex items-start space-x-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-chart-line text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-lg">Vikas Sharma</h4>
+                                <p class="text-green-600 text-sm font-medium">GST Practitioner</p>
+                                <div class="flex items-center mt-1">
+                                    <div class="flex space-x-1 text-yellow-400">
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                        <i class="fas fa-star text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-slate-600 italic leading-relaxed mb-4">
+                            "FinanceFlow's automation has helped us eliminate errors and reduce compliance risks. 
+                            The platform ensures 100% accurate data structuring, making tax filing stress-free. 
+                            Highly recommended for every CA office!"
+                        </p>
+                        <div class="text-sm text-slate-500">
+                            <i class="fas fa-quote-right text-slate-300"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Trust Badges -->
+                <div class="mt-16 text-center">
+                    <div class="inline-flex items-center space-x-8 px-8 py-4 bg-white rounded-2xl shadow-lg border border-slate-200">
+                        <div class="flex items-center space-x-2 text-slate-600">
+                            <i class="fas fa-shield-check text-green-500"></i>
+                            <span class="text-sm font-medium">GST Compliant</span>
+                        </div>
+                        <div class="w-px h-6 bg-slate-300"></div>
+                        <div class="flex items-center space-x-2 text-slate-600">
+                            <i class="fas fa-certificate text-blue-500"></i>
+                            <span class="text-sm font-medium">CA Approved</span>
+                        </div>
+                        <div class="w-px h-6 bg-slate-300"></div>
+                        <div class="flex items-center space-x-2 text-slate-600">
+                            <i class="fas fa-users text-purple-500"></i>
+                            <span class="text-sm font-medium">500+ Professionals</span>
+                        </div>
+                        <div class="w-px h-6 bg-slate-300"></div>
+                        <div class="flex items-center space-x-2 text-slate-600">
+                            <i class="fas fa-clock text-orange-500"></i>
+                            <span class="text-sm font-medium">24/7 Support</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+    <!-- Workflow Section with Updated Height -->
+    <section id="workflow-section" class="py-12 bg-white relative">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-6">
+                    <i class="fas fa-route mr-2"></i>
+                    Workflow Process
+                </div>
+                <h2 class="font-poppins text-4xl lg:text-5xl font-bold text-slate-800 mb-6">
+                    Streamlined Financial
+                    <span class="text-gradient">Operations</span>
+                </h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+                    From upload to insights, our platform automates every step of your financial document processing workflow.
+                </p>
+            </div>
+            
+            <!-- Workflow Steps Container - Updated Height -->
+            <div class="workflow-container min-h-[372px] flex items-center justify-center">
+                <div class="grid lg:grid-cols-3 gap-12 w-full">
+                    
+                    <!-- Step 1 - Hidden Initially -->
+                    <div class="workflow-step opacity-0 invisible transform translate-y-12" data-step="1">
+                        <div class="text-center relative">
+                            <div class="step-circle w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg transform scale-0">
+                                <i class="fas fa-upload text-white text-2xl"></i>
+                            </div>
+                            <div class="connecting-line hidden lg:block absolute top-10 left-1/2 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent transform scale-x-0 opacity-0"></div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 font-poppins transform translate-y-4 opacity-0">Upload & Extract</h3>
+                            <p class="text-slate-600 leading-relaxed transform translate-y-4 opacity-0">
+                                Upload invoices, receipts, and financial documents in any format. 
+                                Our AI instantly extracts structured data with field-level confidence scoring.
+                            </p>
+                            <div class="mt-6 flex justify-center">
+                                <div class="progress-bar w-0 h-1 bg-blue-500 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 - Hidden Initially -->
+                    <div class="workflow-step opacity-0 invisible transform translate-y-12" data-step="2">
+                        <div class="text-center relative">
+                            <div class="step-circle w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg transform scale-0">
+                                <i class="fas fa-eye text-white text-2xl"></i>
+                            </div>
+                            <div class="connecting-line hidden lg:block absolute top-10 left-1/2 w-full h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent transform scale-x-0 opacity-0"></div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 font-poppins transform translate-y-4 opacity-0">Review & Verify</h3>
+                            <p class="text-slate-600 leading-relaxed transform translate-y-4 opacity-0">
+                                Accountants use the dual-pane interface to review extracted data against 
+                                original documents, with smart highlighting of potential discrepancies.
+                            </p>
+                            <div class="mt-6 flex justify-center">
+                                <div class="progress-bar w-0 h-1 bg-green-500 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 - Hidden Initially -->
+                    <div class="workflow-step opacity-0 invisible transform translate-y-12" data-step="3">
+                        <div class="text-center relative">
+                            <div class="step-circle w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg transform scale-0">
+                                <i class="fas fa-chart-line text-white text-2xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4 font-poppins transform translate-y-4 opacity-0">Analyze & Report</h3>
+                            <p class="text-slate-600 leading-relaxed transform translate-y-4 opacity-0">
+                                Generate comprehensive analytics and reports across all companies. 
+                                Real-time dashboards provide actionable insights for strategic decisions.
+                            </p>
+                            <div class="mt-6 flex justify-center">
+                                <div class="progress-bar w-0 h-1 bg-purple-500 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Dots - Initially Hidden -->
+            <div class="progress-dots flex justify-center mt-12 opacity-0">
+                <div class="flex space-x-3">
+                    <div class="progress-dot w-3 h-3 rounded-full bg-gray-300 transition-all duration-300" data-dot="1"></div>
+                    <div class="progress-dot w-3 h-3 rounded-full bg-gray-300 transition-all duration-300" data-dot="2"></div>
+                    <div class="progress-dot w-3 h-3 rounded-full bg-gray-300 transition-all duration-300" data-dot="3"></div>
+                </div>
+            </div>
+
+            <!-- Scroll Hint -->
+            <div class="scroll-hint text-center mt-8 opacity-100 transition-opacity duration-500">
+                <div class="flex flex-col items-center space-y-2 text-slate-500">
+                    <span class="text-sm font-medium">Scroll to reveal workflow steps</span>
+                    <div class="w-6 h-10 border-2 border-slate-300 rounded-full flex justify-center">
+                        <div class="w-1 h-3 bg-slate-400 rounded-full mt-2 animate-bounce"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+    /* Updated workflow container height */
+    .min-h-[372px] {
+        min-height: 372px;
+    }
+
+    /* Or alternatively, you can use a custom class */
+    .workflow-container-height {
+        min-height: 372px;
+    }
+
+    /* Rest of the existing styles */
+    .workflow-step {
+        transition: none;
+    }
+
+    .step-circle.pulse-active {
+        animation: pulse-glow 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% { 
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+        50% { 
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+        }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 1024px) {
+        .connecting-line {
+            display: none !important;
+        }
+        
+        .workflow-container {
+            min-height: auto !important;
+        }
+        
+        /* Override for mobile */
+        .min-h-[372px] {
+            min-height: auto;
+        }
+    }
+    </style>
+
+
+    <script>
+    // Register ScrollTrigger
+    gsap.registerPlugin(ScrollTrigger);
+
+    class ProgressiveWorkflowReveal {
+        constructor() {
+            this.section = document.getElementById('workflow-section');
+            this.container = document.querySelector('.workflow-container');
+            this.steps = document.querySelectorAll('.workflow-step');
+            this.dots = document.querySelectorAll('.progress-dot');
+            this.progressDots = document.querySelector('.progress-dots');
+            this.scrollHint = document.querySelector('.scroll-hint');
+            
+            this.currentStep = 0;
+            this.totalSteps = this.steps.length;
+            this.stepTriggers = [];
+            
+            this.init();
+        }
+        
+        init() {
+            // Create the main pinned section that controls the step reveals
+            this.createMainPinnedSection();
+            
+            // Create mobile fallback
+            this.createMobileFallback();
+        }
+        
+        createMainPinnedSection() {
+            // Only on desktop/tablet
+            if (window.innerWidth < 768) return;
+            
+            // Pin the section and create scroll-controlled step reveals
+            ScrollTrigger.create({
+                trigger: this.section,
+                start: "center center",
+                end: `+=${window.innerHeight * 3}`, // 3 scroll heights for 3 steps
+                pin: true,
+                scrub: 0.5,
+                onUpdate: (self) => {
+                    this.handleScrollProgress(self.progress);
+                },
+                onEnter: () => {
+                    this.showProgressDots();
+                },
+                onLeave: () => {
+                    this.hideScrollHint();
+                },
+                onEnterBack: () => {
+                    this.showProgressDots();
+                },
+                onLeaveBack: () => {
+                    this.hideProgressDots();
+                    this.showScrollHint();
+                }
+            });
+        }
+        
+        handleScrollProgress(progress) {
+            // Divide progress into 3 equal parts for 3 steps
+            const stepProgress = progress * this.totalSteps;
+            const currentStep = Math.floor(stepProgress);
+            const stepInternalProgress = stepProgress - currentStep;
+            
+            // Reveal steps progressively
+            for (let i = 0; i < this.totalSteps; i++) {
+                if (i < currentStep) {
+                    // Step fully revealed
+                    this.revealStep(i, 1);
+                } else if (i === currentStep) {
+                    // Step currently being revealed
+                    this.revealStep(i, stepInternalProgress);
+                } else {
+                    // Step hidden
+                    this.hideStep(i);
+                }
+            }
+            
+            // Update scroll hint based on progress
+            this.updateScrollHint(progress);
+        }
+        
+        revealStep(index, progress) {
+            const step = this.steps[index];
+            const dot = this.dots[index];
+            const circle = step.querySelector('.step-circle');
+            const title = step.querySelector('h3');
+            const description = step.querySelector('p');
+            const line = step.querySelector('.connecting-line');
+            const progressBar = step.querySelector('.progress-bar');
+            
+            // Smooth progress-based reveal
+            const easedProgress = this.easeOutQuart(progress);
+            
+            // Main step container
+            gsap.set(step, {
+                opacity: Math.min(easedProgress * 2, 1),
+                visibility: 'visible',
+                y: (1 - easedProgress) * 50
+            });
+            
+            // Circle animation
+            gsap.set(circle, {
+                scale: easedProgress,
+                rotation: easedProgress * 360
+            });
+            
+            // Title and description with slight delay
+            const textProgress = Math.max(0, (easedProgress - 0.3) / 0.7);
+            gsap.set([title, description], {
+                opacity: textProgress,
+                y: (1 - textProgress) * 20
+            });
+            
+            // Connecting line (desktop only)
+            if (line && window.innerWidth >= 1024) {
+                gsap.set(line, {
+                    opacity: Math.max(0, (easedProgress - 0.5) / 0.5),
+                    scaleX: Math.max(0, (easedProgress - 0.5) / 0.5)
+                });
+            }
+            
+            // Progress bar
+            gsap.set(progressBar, {
+                width: `${Math.max(0, (easedProgress - 0.7) / 0.3) * 64}px`
+            });
+            
+            // Dot indicator
+            if (dot) {
+                if (easedProgress > 0.8) {
+                    gsap.set(dot, {
+                        backgroundColor: "#3b82f6",
+                        scale: 1.3
+                    });
+                    dot.classList.add('active');
+                } else {
+                    gsap.set(dot, {
+                        backgroundColor: "#d1d5db",
+                        scale: 1
+                    });
+                    dot.classList.remove('active');
+                }
+            }
+            
+            // Add pulse effect when fully revealed
+            if (progress >= 1) {
+                circle.classList.add('pulse-active');
+            } else {
+                circle.classList.remove('pulse-active');
+            }
+        }
+        
+        hideStep(index) {
+            const step = this.steps[index];
+            const dot = this.dots[index];
+            const circle = step.querySelector('.step-circle');
+            
+            gsap.set(step, {
+                opacity: 0,
+                visibility: 'hidden',
+                y: 50
+            });
+            
+            gsap.set(circle, {
+                scale: 0
+            });
+            
+            if (dot) {
+                gsap.set(dot, {
+                    backgroundColor: "#d1d5db",
+                    scale: 1
+                });
+                dot.classList.remove('active');
+            }
+            
+            circle.classList.remove('pulse-active');
+        }
+        
+        showProgressDots() {
+            gsap.to(this.progressDots, {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: "power2.out"
+            });
+        }
+        
+        hideProgressDots() {
+            gsap.to(this.progressDots, {
+                opacity: 0,
+                y: 20,
+                duration: 0.4,
+                ease: "power2.in"
+            });
+        }
+        
+        updateScrollHint(progress) {
+            if (!this.scrollHint) return;
+            
+            if (progress < 0.1) {
+                // Show initial hint
+                gsap.set(this.scrollHint, { opacity: 1 });
+                this.scrollHint.innerHTML = `
+                    <div class="flex flex-col items-center space-y-2 text-slate-500">
+                        <span class="text-sm font-medium">Scroll to reveal workflow steps</span>
+                        <div class="w-6 h-10 border-2 border-slate-300 rounded-full flex justify-center">
+                            <div class="w-1 h-3 bg-slate-400 rounded-full mt-2 animate-bounce"></div>
+                        </div>
+                    </div>
+                `;
+            } else if (progress < 0.95) {
+                // Show progress
+                const currentStep = Math.floor(progress * this.totalSteps) + 1;
+                gsap.set(this.scrollHint, { opacity: 0.8 });
+                this.scrollHint.innerHTML = `
+                    <div class="flex flex-col items-center space-y-2 text-blue-600">
+                        <span class="text-sm font-medium">Step ${currentStep} of ${this.totalSteps}</span>
+                        <div class="flex space-x-1">
+                            <i class="fas fa-chevron-up text-xs opacity-50"></i>
+                            <span class="text-xs">Keep scrolling</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Show completion
+                gsap.set(this.scrollHint, { opacity: 1 });
+                this.scrollHint.innerHTML = `
+                    <div class="flex flex-col items-center space-y-2 text-green-600">
+                        <span class="text-sm font-medium">Workflow complete!</span>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-check-circle"></i>
+                            <span class="text-xs">Scroll to continue</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        showScrollHint() {
+            gsap.to(this.scrollHint, {
+                opacity: 1,
+                duration: 0.5
+            });
+        }
+        
+        hideScrollHint() {
+            gsap.to(this.scrollHint, {
+                opacity: 0,
+                duration: 0.5
+            });
+        }
+        
+        createMobileFallback() {
+            // Simple reveal animation for mobile
+            if (window.innerWidth >= 768) return;
+            
+            this.steps.forEach((step, index) => {
+                const circle = step.querySelector('.step-circle');
+                const title = step.querySelector('h3');
+                const description = step.querySelector('p');
+                
+                // Set initial visible state for mobile
+                gsap.set(step, { opacity: 1, visibility: 'visible', y: 0 });
+                gsap.set([circle, title, description], { opacity: 1, y: 0, scale: 1 });
+                
+                // Simple scroll-triggered animation
+                ScrollTrigger.create({
+                    trigger: step,
+                    start: "top 75%",
+                    end: "bottom 25%",
+                    onEnter: () => {
+                        gsap.fromTo(step, 
+                            { opacity: 0, y: 30 },
+                            { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+                        );
+                        gsap.fromTo(circle, 
+                            { scale: 0, rotation: -180 },
+                            { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.7)", delay: 0.2 }
+                        );
+                    },
+                    onLeaveBack: () => {
+                        gsap.to(step, { opacity: 0.3, y: 20, duration: 0.4 });
+                    }
+                });
+            });
+            
+            // Show progress dots on mobile
+            gsap.set(this.progressDots, { opacity: 1 });
+        }
+        
+        // Easing function for smooth progress
+        easeOutQuart(t) {
+            return 1 - Math.pow(1 - t, 4);
+        }
+        
+        destroy() {
+            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        }
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        window.workflowAnimation = new ProgressiveWorkflowReveal();
+    });
+
+    // Handle resize
+    window.addEventListener('resize', () => {
+        ScrollTrigger.refresh();
+    });
+
+    // Cleanup
+    window.addEventListener('beforeunload', () => {
+        if (window.workflowAnimation) {
+            window.workflowAnimation.destroy();
+        }
+    });
+    </script>
+
+
+
+
+
+
+
+        <!-- CTA Section -->
+        <section class="py-20 hero-gradient relative">
+            <div class="max-w-4xl mx-auto text-center px-6 lg:px-8 relative z-10">
+                <h2 class="font-poppins text-4xl lg:text-5xl font-bold text-white mb-6">
+                    Ready to Transform Your
+                    <span class="text-gradient">Financial Operations?</span>
+                </h2>
+                <p class="text-xl text-slate-300 mb-10 leading-relaxed">
+                    Join hundreds of companies already streamlining their financial processes. 
+                    Start your free trial today and experience the future of financial management.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-6 justify-center mb-8">
+                    <button class="btn-primary text-white px-10 py-4 rounded-xl font-semibold text-lg flex items-center justify-center group">
+                        <span>Start Free Trial</span>
+                        <i class="fas fa-rocket ml-3 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                    <button class="glass-effect text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white/20 transition-all duration-300 flex items-center justify-center">
+                        <i class="fas fa-calendar mr-3"></i>
+                        Schedule Demo
+                    </button>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-slate-300">
+                    <div class="flex items-center">
+                        <i class="fas fa-check text-green-400 mr-2"></i>
+                        14-day free trial
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-check text-green-400 mr-2"></i>
+                        No credit card required
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-check text-green-400 mr-2"></i>
+                        Setup in 5 minutes
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-slate-900 text-white py-16">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="grid lg:grid-cols-5 gap-8">
+                    <!-- Brand -->
+                    <div class="lg:col-span-2">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-infinity text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold font-poppins">FinanceFlow</h1>
+                                <p class="text-xs text-slate-400 -mt-1">Professional Suite</p>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 mb-6 leading-relaxed">
+                            Empowering businesses with intelligent financial document processing, 
+                            verification workflows, and advanced analytics for modern finance teams.
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center hover:bg-blue-600 transition-colors">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Product -->
+                    <div>
+                        <h4 class="font-semibold mb-6 text-white">Product</h4>
+                        <ul class="space-y-3 text-slate-400">
+                            <li><a href="#" class="hover:text-white transition-colors">Features</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Pricing</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">API Documentation</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Integrations</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Security</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Company -->
+                    <div>
+                        <h4 class="font-semibold mb-6 text-white">Company</h4>
+                        <ul class="space-y-3 text-slate-400">
+                            <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Press</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Partners</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Support -->
+                    <div>
+                        <h4 class="font-semibold mb-6 text-white">Support</h4>
+                        <ul class="space-y-3 text-slate-400">
+                            <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">System Status</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Community</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Training</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="border-t border-slate-800 mt-12 pt-8 flex flex-col lg:flex-row items-center justify-between">
+                    <p class="text-slate-400 text-sm">
+                        © 2025 FinanceFlow Professional Suite. All rights reserved.
+                    </p>
+                    <div class="flex items-center space-x-6 mt-4 lg:mt-0">
+                        <a href="#" class="text-slate-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-slate-400 hover:text-white text-sm transition-colors">Terms of Service</a>
+                        <a href="#" class="text-slate-400 hover:text-white text-sm transition-colors">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+
+    <!-- Login/Signup Popup -->
+    <div id="auth-popup" class="fixed bottom-6 right-6 z-50 transform translate-y-full opacity-0 invisible">
+        <div class="auth-popup-container bg-white rounded-2xl shadow-2xl w-96 max-w-[90vw] overflow-hidden border border-slate-200">
+            <!-- Header -->
+            <div class="popup-header bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white relative">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold font-poppins" id="popup-title">Welcome Back</h3>
+                        <p class="text-blue-100 text-sm" id="popup-subtitle">Sign in to your account</p>
+                    </div>
+                    <button id="close-popup" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <!-- Floating elements for design -->
+                <div class="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl"></div>
+                <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-purple-300/20 rounded-full blur-2xl"></div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="popup-content p-6">
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form active">
+                    <div class="space-y-4">
+                        <!-- Email Input -->
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-envelope text-slate-400"></i>
+                                </div>
+                                <input type="email" class="form-input w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Enter your email" required>
+                            </div>
+                        </div>
+
+                        <!-- Password Input -->
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-slate-400"></i>
+                                </div>
+                                <input type="password" class="form-input w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Enter your password" required>
+                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password">
+                                    <i class="fas fa-eye text-slate-400 hover:text-slate-600 transition-colors"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Remember Me & Forgot Password -->
+                        <div class="flex items-center justify-between text-sm">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                <span class="ml-2 text-slate-600">Remember me</span>
+                            </label>
+                            <a href="#" class="text-blue-600 hover:text-blue-500 font-medium">Forgot password?</a>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-xl font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 btn-primary-popup">
+                            <span class="btn-text">Sign In</span>
+                            <div class="btn-loader hidden">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>
+                                Signing in...
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="my-6 flex items-center">
+                        <div class="flex-1 border-t border-slate-200"></div>
+                        <span class="px-4 text-sm text-slate-500 bg-white">Or continue with</span>
+                        <div class="flex-1 border-t border-slate-200"></div>
+                    </div>
+
+                    <!-- Social Login -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" class="flex items-center justify-center px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
+                            <i class="fab fa-google text-red-500 mr-2"></i>
+                            <span class="text-sm font-medium text-slate-700">Google</span>
+                        </button>
+                        <button type="button" class="flex items-center justify-center px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
+                            <i class="fab fa-microsoft text-blue-600 mr-2"></i>
+                            <span class="text-sm font-medium text-slate-700">Microsoft</span>
+                        </button>
+                    </div>
+
+                    <!-- Switch to Signup -->
+                    <p class="mt-6 text-center text-sm text-slate-600">
+                        Don't have an account? 
+                        <button type="button" id="switch-to-signup" class="text-blue-600 hover:text-blue-500 font-medium">Create one</button>
+                    </p>
+                </form>
+
+                <!-- Signup Form -->
+                <form id="signup-form" class="auth-form">
+                    <div class="space-y-4">
+                        <!-- Full Name Input -->
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-user text-slate-400"></i>
+                                </div>
+                                <input type="text" class="form-input w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Enter your full name" required>
+                            </div>
+                        </div>
+
+                        <!-- Email Input -->
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-envelope text-slate-400"></i>
+                                </div>
+                                <input type="email" class="form-input w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Enter your email" required>
+                            </div>
+                        </div>
+
+                        <!-- Company Name -->
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Company Name</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-building text-slate-400"></i>
+                                </div>
+                                <input type="text" class="form-input w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Enter your company name" required>
+                            </div>
+                        </div>
+
+                        <!-- Password Input -->
+                        <div class="form-group">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-slate-400"></i>
+                                </div>
+                                <input type="password" class="form-input w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Create a password" required>
+                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password">
+                                    <i class="fas fa-eye text-slate-400 hover:text-slate-600 transition-colors"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Terms Checkbox -->
+                        <div class="flex items-start">
+                            <input type="checkbox" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 mt-1" required>
+                            <label class="ml-3 text-sm text-slate-600">
+                                I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and 
+                                <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-xl font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 btn-primary-popup">
+                            <span class="btn-text">Create Account</span>
+                            <div class="btn-loader hidden">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>
+                                Creating account...
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Switch to Login -->
+                    <p class="mt-6 text-center text-sm text-slate-600">
+                        Already have an account? 
+                        <button type="button" id="switch-to-login" class="text-blue-600 hover:text-blue-500 font-medium">Sign in</button>
+                    </p>
+                </form>
+            </div>
+
+            <!-- Success Message -->
+            <div id="success-message" class="popup-content p-6 text-center hidden">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Success!</h3>
+                <p class="text-slate-600 mb-4">Your account has been created successfully.</p>
+                <button class="text-blue-600 hover:text-blue-500 font-medium">Continue to Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backdrop -->
+    <div id="popup-backdrop" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 opacity-0 invisible transition-all duration-300"></div>
+
+    <style>
+    /* Popup Styles */
+    .auth-popup-container {
+        transform: translateY(20px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #auth-popup.show {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #auth-popup.show .auth-popup-container {
+        transform: translateY(0);
+    }
+
+    #popup-backdrop.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Form Styles */
+    .auth-form {
+        display: none;
+    }
+
+    .auth-form.active {
+        display: block;
+        animation: slideInUp 0.5s ease-out;
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-input {
+        background: rgba(248, 250, 252, 0.8);
+        backdrop-filter: blur(10px);
+    }
+
+    .form-input:focus {
+        background: white;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .btn-primary-popup:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    }
+
+    /* Loading state */
+    .btn-primary-popup.loading .btn-text {
+        display: none;
+    }
+
+    .btn-primary-popup.loading .btn-loader {
+        display: block;
+    }
+
+    /* Form validation */
+    .form-input.error {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    .form-group .error-message {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+        #auth-popup {
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
+        
+        .auth-popup-container {
+            width: 100%;
+            max-width: none;
+            border-radius: 1rem 1rem 0 0;
+            margin: 0;
+        }
+    }
+
+    /* Smooth animations */
+    .popup-header * {
+        transition: all 0.3s ease;
+    }
+
+    /* Custom scrollbar for popup content */
+    .popup-content {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .popup-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .popup-content::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .popup-content::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .popup-content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+    </style>
+
+    <script>
+    // Fixed Authentication Popup Controller
+    class AuthPopup {
+        constructor() {
+            this.popup = document.getElementById('auth-popup');
+            this.backdrop = document.getElementById('popup-backdrop');
+            this.closeBtn = document.getElementById('close-popup');
+            
+            this.loginForm = document.getElementById('login-form');
+            this.signupForm = document.getElementById('signup-form');
+            this.successMessage = document.getElementById('success-message');
+            
+            this.switchToSignup = document.getElementById('switch-to-signup');
+            this.switchToLogin = document.getElementById('switch-to-login');
+            
+            this.popupTitle = document.getElementById('popup-title');
+            this.popupSubtitle = document.getElementById('popup-subtitle');
+            
+            this.currentForm = 'login';
+            this.isVisible = false;
+            
+            this.init();
+        }
+        
+        init() {
+            // Find buttons by text content (proper way)
+            this.setupButtonDetection();
+            
+            // Event listeners
+            this.closeBtn.addEventListener('click', () => this.hide());
+            this.backdrop.addEventListener('click', () => this.hide());
+            
+            this.switchToSignup.addEventListener('click', () => this.switchForm('signup'));
+            this.switchToLogin.addEventListener('click', () => this.switchForm('login'));
+            
+            // Form submissions
+            this.loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+            this.signupForm.addEventListener('submit', (e) => this.handleSignup(e));
+            
+            // Password toggle functionality
+            this.setupPasswordToggles();
+            
+            // Form validation
+            this.setupFormValidation();
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.isVisible) {
+                    this.hide();
+                }
+            });
+        }
+        
+        setupButtonDetection() {
+            // Find all buttons and check their text content
+            const buttons = document.querySelectorAll('button');
+            
+            buttons.forEach(button => {
+                const buttonText = button.textContent || button.innerText;
+                
+                // Check for Sign In buttons (exclude popup buttons)
+                if (buttonText.includes('Sign In') && !button.closest('#auth-popup')) {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.show('login');
+                    });
+                }
+                
+                // Check for Start Trial / Get Started buttons
+                if ((buttonText.includes('Start Trial') || 
+                    buttonText.includes('Get Started') || 
+                    buttonText.includes('Start Free Trial')) && 
+                    !button.closest('#auth-popup')) {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.show('signup');
+                    });
+                }
+            });
+            
+            console.log('Button detection setup complete'); // Debug log
+        }
+        
+        show(type = 'login') {
+            this.currentForm = type;
+            this.switchForm(type);
+            
+            // Show popup with animation
+            this.popup.style.visibility = 'visible';
+            this.backdrop.style.visibility = 'visible';
+            
+            // Use GSAP if available, otherwise use CSS transitions
+            if (typeof gsap !== 'undefined') {
+                gsap.timeline()
+                    .to(this.backdrop, { opacity: 1, duration: 0.3 })
+                    .to(this.popup, { 
+                        opacity: 1, 
+                        y: 0, 
+                        duration: 0.5, 
+                        ease: "back.out(1.2)" 
+                    }, "-=0.1");
+            } else {
+                // Fallback CSS animation
+                this.backdrop.classList.add('show');
+                this.popup.classList.add('show');
+            }
+            
+            this.isVisible = true;
+            document.body.style.overflow = 'hidden';
+            
+            console.log(`Showing ${type} form`); // Debug log
+        }
+        
+        hide() {
+            // Use GSAP if available, otherwise use CSS transitions
+            if (typeof gsap !== 'undefined') {
+                gsap.timeline()
+                    .to(this.popup, { 
+                        opacity: 0, 
+                        y: 100, 
+                        duration: 0.4, 
+                        ease: "power2.in" 
+                    })
+                    .to(this.backdrop, { opacity: 0, duration: 0.3 }, "-=0.2")
+                    .set([this.popup, this.backdrop], { visibility: 'hidden' });
+            } else {
+                // Fallback CSS animation
+                this.popup.classList.remove('show');
+                this.backdrop.classList.remove('show');
+                
+                setTimeout(() => {
+                    this.popup.style.visibility = 'hidden';
+                    this.backdrop.style.visibility = 'hidden';
+                }, 400);
+            }
+            
+            this.isVisible = false;
+            document.body.style.overflow = '';
+            
+            // Reset forms
+            setTimeout(() => {
+                this.resetForms();
+            }, 500);
+        }
+        
+        switchForm(type) {
+            this.currentForm = type;
+            
+            if (type === 'login') {
+                this.loginForm.classList.add('active');
+                this.signupForm.classList.remove('active');
+                this.popupTitle.textContent = 'Welcome Back';
+                this.popupSubtitle.textContent = 'Sign in to your account';
+            } else {
+                this.signupForm.classList.add('active');
+                this.loginForm.classList.remove('active');
+                this.popupTitle.textContent = 'Get Started';
+                this.popupSubtitle.textContent = 'Create your account';
+            }
+        }
+        
+        async handleLogin(e) {
+            e.preventDefault();
+            const btn = this.loginForm.querySelector('button[type="submit"]');
+            this.setLoadingState(btn, true);
+            
+            // Simulate API call
+            await this.delay(2000);
+            
+            // Show success (you can replace with actual login logic)
+            this.showSuccess('Welcome back! Redirecting to dashboard...');
+            
+            this.setLoadingState(btn, false);
+        }
+        
+        async handleSignup(e) {
+            e.preventDefault();
+            const btn = this.signupForm.querySelector('button[type="submit"]');
+            this.setLoadingState(btn, true);
+            
+            // Simulate API call
+            await this.delay(2500);
+            
+            // Show success
+            this.showSuccess('Account created successfully! Please check your email for verification.');
+            
+            this.setLoadingState(btn, false);
+        }
+        
+        showSuccess(message) {
+            const forms = document.querySelectorAll('.auth-form');
+            forms.forEach(form => form.style.display = 'none');
+            
+            this.successMessage.style.display = 'block';
+            this.successMessage.querySelector('p').textContent = message;
+            
+            this.popupTitle.textContent = 'Success!';
+            this.popupSubtitle.textContent = 'Welcome to FinanceFlow';
+            
+            // Auto close after 3 seconds
+            setTimeout(() => {
+                this.hide();
+            }, 3000);
+        }
+        
+        setLoadingState(btn, loading) {
+            if (loading) {
+                btn.classList.add('loading');
+                btn.disabled = true;
+            } else {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+        
+        setupPasswordToggles() {
+            const toggleButtons = document.querySelectorAll('.toggle-password');
+            toggleButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const input = btn.parentElement.querySelector('input');
+                    const icon = btn.querySelector('i');
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.replace('fa-eye', 'fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.replace('fa-eye-slash', 'fa-eye');
+                    }
+                });
+            });
+        }
+        
+        setupFormValidation() {
+            const inputs = document.querySelectorAll('.form-input');
+            inputs.forEach(input => {
+                input.addEventListener('blur', () => this.validateField(input));
+                input.addEventListener('input', () => this.clearFieldError(input));
+            });
+        }
+        
+        validateField(input) {
+            const value = input.value.trim();
+            let isValid = true;
+            let message = '';
+            
+            // Required field validation
+            if (input.hasAttribute('required') && !value) {
+                isValid = false;
+                message = 'This field is required';
+            }
+            
+            // Email validation
+            if (input.type === 'email' && value) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(value)) {
+                    isValid = false;
+                    message = 'Please enter a valid email address';
+                }
+            }
+            
+            // Password validation
+            if (input.type === 'password' && value) {
+                if (value.length < 6) {
+                    isValid = false;
+                    message = 'Password must be at least 6 characters';
+                }
+            }
+            
+            if (!isValid) {
+                this.showFieldError(input, message);
+            } else {
+                this.clearFieldError(input);
+            }
+            
+            return isValid;
+        }
+        
+        showFieldError(input, message) {
+            input.classList.add('error');
+            
+            let errorDiv = input.parentElement.parentElement.querySelector('.error-message');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                input.parentElement.parentElement.appendChild(errorDiv);
+            }
+            errorDiv.textContent = message;
+        }
+        
+        clearFieldError(input) {
+            input.classList.remove('error');
+            const errorDiv = input.parentElement.parentElement.querySelector('.error-message');
+            if (errorDiv) {
+                errorDiv.remove();
+            }
+        }
+        
+        resetForms() {
+            this.loginForm.reset();
+            this.signupForm.reset();
+            this.successMessage.style.display = 'none';
+            
+            document.querySelectorAll('.auth-form').forEach(form => {
+                form.style.display = form.id === 'login-form' ? 'block' : 'none';
+            });
+            
+            this.loginForm.classList.add('active');
+            this.signupForm.classList.remove('active');
+            
+            // Clear all errors
+            document.querySelectorAll('.form-input.error').forEach(input => {
+                this.clearFieldError(input);
+            });
+        }
+        
+        delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    }
+
+    // Initialize Auth Popup when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        window.authPopup = new AuthPopup();
+    });
+    </script>
+
+
+    </body>
+    </html>

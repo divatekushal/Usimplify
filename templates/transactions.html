@@ -1,0 +1,1056 @@
+{% extends "base.html" %}
+
+{% block title %}Transactions - FinanceFlow{% endblock %}
+{% block page_title %}Transactions{% endblock %}
+{% block page_subtitle %}Comprehensive Transaction Management & Analysis{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f8fafc;
+        color: #334155;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .transactions-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    /* Tab Navigation */
+    .tab-navigation {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        overflow-x: auto;
+    }
+
+    .tab-buttons {
+        display: flex;
+        gap: 0.5rem;
+        min-width: max-content;
+    }
+
+    .tab-btn {
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #64748b;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .tab-btn:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+
+    .tab-btn.active {
+        background: #1e293b;
+        color: #ffffff;
+        border-color: #1e293b;
+    }
+
+    /* Main Content Area */
+    .main-content {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+
+    .content-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .table-info h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .table-info p {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        border: 1px solid;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+        border-color: #2563eb;
+        transform: translateY(-1px);
+    }
+
+    .btn-success {
+        background: #10b981;
+        color: white;
+        border-color: #10b981;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+        border-color: #059669;
+        transform: translateY(-1px);
+    }
+
+    /* Filters */
+    .filters-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .filters-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        transition: all 0.2s ease;
+    }
+
+    .filter-btn.active {
+        background: #1e293b;
+        color: white;
+        border-color: #1e293b;
+    }
+
+    .filter-btn:hover:not(.active) {
+        background: #f3f4f6;
+        border-color: #9ca3af;
+    }
+
+    /* Ledger Enquiry Filters */
+    .ledger-filters {
+        display: none;
+        gap: 1rem;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .ledger-filters.active {
+        display: flex;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .filter-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .filter-input {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        min-width: 120px;
+        transition: border-color 0.2s ease;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-container {
+        position: relative;
+        min-width: 280px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: border-color 0.2s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+
+    /* Table Styles */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px;
+    }
+
+    .data-table th {
+        background: #f8fafc;
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .data-table th:hover {
+        background: #f1f5f9;
+    }
+
+    .data-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.875rem;
+        color: #374151;
+        white-space: nowrap;
+    }
+
+    .data-table tr:hover {
+        background: #f9fafb;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .status-paid { background: #d1fae5; color: #065f46; }
+    .status-unpaid { background: #fed7aa; color: #9a3412; }
+    .status-partial { background: #e0e7ff; color: #4338ca; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+
+    /* Type Badges */
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        padding: 0.5rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-view {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .btn-view:hover {
+        background: #c7d2fe;
+        transform: scale(1.05);
+    }
+
+    .btn-edit {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .btn-edit:hover {
+        background: #fde68a;
+        transform: scale(1.05);
+    }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .btn-delete:hover {
+        background: #fecaca;
+        transform: scale(1.05);
+    }
+
+    /* Amount Styling */
+    .amount {
+        font-family: 'Monaco', 'Consolas', monospace;
+        text-align: right;
+        font-weight: 600;
+    }
+
+    .amount.positive { color: #059669; }
+    .amount.negative { color: #dc2626; }
+    .amount.zero { color: #64748b; }
+
+    /* Pagination */
+    .pagination-container {
+        padding: 1rem 2rem;
+        border-top: 1px solid #e5e7eb;
+        background: #f8fafc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .pagination-info {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-btn {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .page-btn:hover:not(:disabled) {
+        background: #f3f4f6;
+        transform: translateY(-1px);
+    }
+
+    .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .page-btn.active {
+        background: #1e293b;
+        color: white;
+        border-color: #1e293b;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #64748b;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .header-top {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .transactions-container {
+            padding: 1rem;
+        }
+
+        .filters-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-container {
+            min-width: auto;
+        }
+
+        .pagination-container {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .data-table {
+            min-width: 600px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="transactions-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Transaction Management</h1>
+        <p>Comprehensive view of all financial transactions across your business</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-table="sales" onclick="switchTable('sales')">
+                <i class="fas fa-chart-line"></i>
+                Sales
+            </button>
+            <button class="tab-btn" data-table="purchase" onclick="switchTable('purchase')">
+                <i class="fas fa-shopping-cart"></i>
+                Purchase
+            </button>
+            <button class="tab-btn" data-table="expenses" onclick="switchTable('expenses')">
+                <i class="fas fa-receipt"></i>
+                Expenses
+            </button>
+            <button class="tab-btn" data-table="payments" onclick="switchTable('payments')">
+                <i class="fas fa-exchange-alt"></i>
+                Payments/Receipts
+            </button>
+            <button class="tab-btn" data-table="other" onclick="switchTable('other')">
+                <i class="fas fa-ellipsis-h"></i>
+                Other Entries
+            </button>
+            <button class="tab-btn" data-table="ledger" onclick="switchTable('ledger')">
+                <i class="fas fa-book"></i>
+                Ledger Enquiry
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="header-top">
+                <div class="table-info">
+                    <h2 id="table-title">Sales Transactions</h2>
+                    <p id="table-description">Manage all sales invoices and customer transactions</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="addNewTransaction()">
+                        <i class="fas fa-plus"></i>
+                        Add New
+                    </button>
+                    <button class="btn btn-primary" onclick="exportTransactions()">
+                        <i class="fas fa-download"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-container">
+                <!-- Standard Filters (for tables 1-5) -->
+                <div class="filters-group" id="standard-filters">
+                    <button class="filter-btn active" data-filter="all" onclick="filterTransactions('all')">All</button>
+                    <button class="filter-btn" data-filter="paid" onclick="filterTransactions('paid')">Paid</button>
+                    <button class="filter-btn" data-filter="partial" onclick="filterTransactions('partial')">Partial Paid</button>
+                    <button class="filter-btn" data-filter="unpaid" onclick="filterTransactions('unpaid')">Unpaid</button>
+                    <button class="filter-btn" data-filter="cancelled" onclick="filterTransactions('cancelled')">Cancelled</button>
+                </div>
+
+                <!-- Ledger Enquiry Filters (for table 6) -->
+                <div class="ledger-filters" id="ledger-filters">
+                    <div class="filter-group">
+                        <label class="filter-label">GL Name</label>
+                        <select class="filter-input" id="gl-name">
+                            <option value="">All Ledgers</option>
+                            <option value="cash">Cash Account</option>
+                            <option value="bank">Bank Account</option>
+                            <option value="sales">Sales Account</option>
+                            <option value="purchase">Purchase Account</option>
+                            <option value="expenses">Expense Account</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">From Date</label>
+                        <input type="date" class="filter-input" id="from-date">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">To Date</label>
+                        <input type="date" class="filter-input" id="to-date">
+                    </div>
+                    <button class="btn btn-primary" onclick="applyLedgerFilters()">
+                        <i class="fas fa-search"></i>
+                        Go
+                    </button>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" 
+                           id="search-input" 
+                           class="search-input"
+                           placeholder="Search transactions..." 
+                           onkeyup="searchTransactions()">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <table class="data-table">
+                <thead id="table-header">
+                    <!-- Table headers will be populated by JavaScript -->
+                </thead>
+                <tbody id="table-body">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Showing <span id="showing-start">1</span> to <span id="showing-end">10</span> of <span id="total-records">50</span> records
+            </div>
+            <div class="pagination-controls">
+                <button class="page-btn" id="prev-page" onclick="changePage(-1)" disabled>Previous</button>
+                <div id="page-numbers"></div>
+                <button class="page-btn" id="next-page" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Sample data for each table
+    const tableData = {
+        sales: [
+            {id: 1, date: '2025-08-22', docId: 'INV-001', type: 'Invoice', customer: 'Acme Corp', invoiceDate: '2025-08-20', invoiceNumber: 'INV-2025-001', totalAmount: 125000, paidAmount: 125000, balance: 0, status: 'paid'},
+            {id: 2, date: '2025-08-21', docId: 'INV-002', type: 'Invoice', customer: 'Tech Solutions', invoiceDate: '2025-08-19', invoiceNumber: 'INV-2025-002', totalAmount: 89000, paidAmount: 45000, balance: 44000, status: 'partial'},
+            {id: 3, date: '2025-08-20', docId: 'INV-003', type: 'Invoice', customer: 'Global Industries', invoiceDate: '2025-08-18', invoiceNumber: 'INV-2025-003', totalAmount: 156000, paidAmount: 0, balance: 156000, status: 'unpaid'},
+            {id: 4, date: '2025-08-19', docId: 'INV-004', type: 'Credit Note', customer: 'Beta Electronics', invoiceDate: '2025-08-17', invoiceNumber: 'CN-2025-001', totalAmount: 25000, paidAmount: 25000, balance: 0, status: 'cancelled'},
+            {id: 5, date: '2025-08-18', docId: 'INV-005', type: 'Invoice', customer: 'Smart Systems', invoiceDate: '2025-08-16', invoiceNumber: 'INV-2025-005', totalAmount: 78000, paidAmount: 78000, balance: 0, status: 'paid'}
+        ],
+        purchase: [
+            {id: 1, date: '2025-08-22', type: 'Purchase', supplier: 'Alpha Steel', invoiceDate: '2025-08-20', invoiceNumber: 'PI-2025-001', totalAmount: 95000, paidAmount: 95000, balance: 0, status: 'paid'},
+            {id: 2, date: '2025-08-21', type: 'Purchase', supplier: 'Beta Chemicals', invoiceDate: '2025-08-19', invoiceNumber: 'PI-2025-002', totalAmount: 67000, paidAmount: 30000, balance: 37000, status: 'partial'},
+            {id: 3, date: '2025-08-20', type: 'Purchase', supplier: 'Gamma Electronics', invoiceDate: '2025-08-18', invoiceNumber: 'PI-2025-003', totalAmount: 123000, paidAmount: 0, balance: 123000, status: 'unpaid'},
+            {id: 4, date: '2025-08-19', type: 'Purchase Return', supplier: 'Delta Manufacturing', invoiceDate: '2025-08-17', invoiceNumber: 'PR-2025-001', totalAmount: 15000, paidAmount: 15000, balance: 0, status: 'cancelled'},
+            {id: 5, date: '2025-08-18', type: 'Purchase', supplier: 'Epsilon Industries', invoiceDate: '2025-08-16', invoiceNumber: 'PI-2025-005', totalAmount: 89000, paidAmount: 89000, balance: 0, status: 'paid'}
+        ],
+        expenses: [
+            {id: 1, date: '2025-08-22', docId: 'EXP-001', type: 'Office Rent', supplier: 'Property Solutions', invoiceDate: '2025-08-20', totalAmount: 45000, paidAmount: 45000, balance: 0, status: 'paid'},
+            {id: 2, date: '2025-08-21', docId: 'EXP-002', type: 'Utilities', supplier: 'Power Corp', invoiceDate: '2025-08-19', totalAmount: 12000, paidAmount: 6000, balance: 6000, status: 'partial'},
+            {id: 3, date: '2025-08-20', docId: 'EXP-003', type: 'Marketing', supplier: 'Ad Agency', invoiceDate: '2025-08-18', totalAmount: 25000, paidAmount: 0, balance: 25000, status: 'unpaid'},
+            {id: 4, date: '2025-08-19', docId: 'EXP-004', type: 'Travel', supplier: 'Travel Co', invoiceDate: '2025-08-17', totalAmount: 8000, paidAmount: 8000, balance: 0, status: 'cancelled'},
+            {id: 5, date: '2025-08-18', docId: 'EXP-005', type: 'Maintenance', supplier: 'Service Provider', invoiceDate: '2025-08-16', totalAmount: 15000, paidAmount: 15000, balance: 0, status: 'paid'}
+        ],
+        payments: [
+            {id: 1, date: '2025-08-22', partyName: 'Acme Corp', narration: 'Payment against INV-2025-001', mode: 'Bank Transfer', amount: 125000},
+            {id: 2, date: '2025-08-21', partyName: 'Alpha Steel', narration: 'Payment for raw materials', mode: 'Cheque', amount: 95000},
+            {id: 3, date: '2025-08-20', partyName: 'Property Solutions', narration: 'Office rent payment', mode: 'Cash', amount: 45000},
+            {id: 4, date: '2025-08-19', partyName: 'Tech Solutions', narration: 'Partial payment received', mode: 'UPI', amount: 45000},
+            {id: 5, date: '2025-08-18', partyName: 'Smart Systems', narration: 'Invoice settlement', mode: 'NEFT', amount: 78000}
+        ],
+        other: [
+            {id: 1, date: '2025-08-22', type: 'Journal Entry', narration: 'Depreciation on assets', debitAmount: 15000, creditAmount: 0, balance: 15000},
+            {id: 2, date: '2025-08-21', type: 'Adjustment', narration: 'Bank charges', debitAmount: 500, creditAmount: 0, balance: 500},
+            {id: 3, date: '2025-08-20', type: 'Provision', narration: 'Provision for bad debts', debitAmount: 8000, creditAmount: 0, balance: 8000},
+            {id: 4, date: '2025-08-19', type: 'Reversal', narration: 'Reverse excess provision', debitAmount: 0, creditAmount: 3000, balance: -3000},
+            {id: 5, date: '2025-08-18', type: 'Transfer', narration: 'Inter-branch transfer', debitAmount: 25000, creditAmount: 25000, balance: 0}
+        ],
+        ledger: [
+            {id: 1, date: '2025-08-22', type: 'Sales', narration: 'Invoice INV-2025-001', debitAmount: 125000, creditAmount: 0, balance: 125000},
+            {id: 2, date: '2025-08-22', type: 'Receipt', narration: 'Payment received from Acme Corp', debitAmount: 0, creditAmount: 125000, balance: 0},
+            {id: 3, date: '2025-08-21', type: 'Purchase', narration: 'Purchase from Alpha Steel', debitAmount: 0, creditAmount: 95000, balance: -95000},
+            {id: 4, date: '2025-08-21', type: 'Payment', narration: 'Payment to Alpha Steel', debitAmount: 95000, creditAmount: 0, balance: 0},
+            {id: 5, date: '2025-08-20', type: 'Expense', narration: 'Office rent payment', debitAmount: 0, creditAmount: 45000, balance: -45000}
+        ]
+    };
+
+    // Table configurations
+    const tableConfig = {
+        sales: {
+            title: 'Sales Transactions',
+            description: 'Manage all sales invoices and customer transactions',
+            headers: ['SI', 'Date', 'Doc ID', 'Type', 'Customer', 'Invoice Date', 'Invoice Number', 'Total Amount', 'Paid Amount', 'Balance', 'Actions'],
+            columns: ['id', 'date', 'docId', 'type', 'customer', 'invoiceDate', 'invoiceNumber', 'totalAmount', 'paidAmount', 'balance', 'actions']
+        },
+        purchase: {
+            title: 'Purchase Transactions',
+            description: 'Manage all purchase orders and supplier transactions',
+            headers: ['SI', 'Date', 'Type', 'Supplier', 'Invoice Date', 'Invoice Number', 'Total Amount', 'Paid Amount', 'Balance', 'Status', 'Actions'],
+            columns: ['id', 'date', 'type', 'supplier', 'invoiceDate', 'invoiceNumber', 'totalAmount', 'paidAmount', 'balance', 'status', 'actions']
+        },
+        expenses: {
+            title: 'Expense Transactions',
+            description: 'Manage all business expenses and vendor payments',
+            headers: ['SI', 'Date', 'Doc ID', 'Type', 'Supplier', 'Invoice Date', 'Total Amount', 'Paid Amount', 'Balance', 'Status', 'Actions'],
+            columns: ['id', 'date', 'docId', 'type', 'supplier', 'invoiceDate', 'totalAmount', 'paidAmount', 'balance', 'status', 'actions']
+        },
+        payments: {
+            title: 'Payments & Receipts',
+            description: 'Track all payment transactions and cash flows',
+            headers: ['SI', 'Date', 'Party Name', 'Narration', 'Mode', 'Amount', 'Actions'],
+            columns: ['id', 'date', 'partyName', 'narration', 'mode', 'amount', 'actions']
+        },
+        other: {
+            title: 'Other Entries',
+            description: 'Journal entries, adjustments and other transactions',
+            headers: ['SI', 'Date', 'Type', 'Narration', 'Debit Amount', 'Credit Amount', 'Balance'],
+            columns: ['id', 'date', 'type', 'narration', 'debitAmount', 'creditAmount', 'balance']
+        },
+        ledger: {
+            title: 'Ledger Enquiry',
+            description: 'Detailed ledger analysis and account statements',
+            headers: ['SI', 'Date', 'Type', 'Narration', 'Debit Amount', 'Credit Amount', 'Balance'],
+            columns: ['id', 'date', 'type', 'narration', 'debitAmount', 'creditAmount', 'balance']
+        }
+    };
+
+    let currentTable = 'sales';
+    let currentFilter = 'all';
+    let filteredData = [];
+    let currentPage = 1;
+    let recordsPerPage = 10;
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        switchTable('sales');
+    });
+
+    function switchTable(tableName) {
+        currentTable = tableName;
+        currentFilter = 'all';
+        currentPage = 1;
+
+        // Update active tab
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.table === tableName) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Update table info
+        const config = tableConfig[tableName];
+        document.getElementById('table-title').textContent = config.title;
+        document.getElementById('table-description').textContent = config.description;
+
+        // Show/hide appropriate filters
+        if (tableName === 'ledger') {
+            document.getElementById('standard-filters').style.display = 'none';
+            document.getElementById('ledger-filters').classList.add('active');
+        } else {
+            document.getElementById('standard-filters').style.display = 'flex';
+            document.getElementById('ledger-filters').classList.remove('active');
+        }
+
+        // Reset filter buttons for standard filters
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.filter === 'all') {
+                btn.classList.add('active');
+            }
+        });
+
+        // Update table
+        filteredData = [...tableData[tableName]];
+        renderTable();
+        updatePagination();
+    }
+
+    function renderTable() {
+        const config = tableConfig[currentTable];
+        const thead = document.getElementById('table-header');
+        const tbody = document.getElementById('table-body');
+
+        // Render headers
+        thead.innerHTML = `
+            <tr>
+                ${config.headers.map(header => `<th onclick="sortTable('${header.toLowerCase()}')">${header} <i class="fas fa-sort"></i></th>`).join('')}
+            </tr>
+        `;
+
+        // Render data
+        const start = (currentPage - 1) * recordsPerPage;
+        const end = start + recordsPerPage;
+        const pageData = filteredData.slice(start, end);
+
+        if (pageData.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="${config.headers.length}" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <div>No records found</div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = pageData.map((row, index) => {
+            const cells = config.columns.map(col => {
+                if (col === 'actions') {
+                    if (currentTable === 'other' || currentTable === 'ledger') {
+                        return `
+                            <td style="text-align: center;">
+                                <div class="action-buttons">
+                                    <button class="action-btn btn-view" onclick="viewRecord(${row.id})" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                    } else {
+                        return `
+                            <td style="text-align: center;">
+                                <div class="action-buttons">
+                                    <button class="action-btn btn-view" onclick="viewRecord(${row.id})" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit" onclick="editRecord(${row.id})" title="Edit Record">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete" onclick="deleteRecord(${row.id})" title="Delete Record">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                    }
+                } else if (col === 'id') {
+                    return `<td style="font-weight: 600;">${start + index + 1}</td>`;
+                } else if (['totalAmount', 'paidAmount', 'balance', 'amount', 'debitAmount', 'creditAmount'].includes(col)) {
+                    const value = row[col] || 0;
+                    const amountClass = value > 0 ? 'positive' : value < 0 ? 'negative' : 'zero';
+                    return `<td class="amount ${amountClass}">₹${Math.abs(value).toLocaleString('en-IN')}</td>`;
+                } else if (col === 'status') {
+                    return `<td><span class="status-badge status-${row[col]}">${capitalizeFirst(row[col])}</span></td>`;
+                } else if (col === 'type') {
+                    return `<td><span class="type-badge">${row[col]}</span></td>`;
+                } else if (col === 'date' || col === 'invoiceDate') {
+                    return `<td>${formatDate(row[col])}</td>`;
+                } else {
+                    return `<td>${row[col] || '-'}</td>`;
+                }
+            }).join('');
+
+            return `<tr>${cells}</tr>`;
+        }).join('');
+    }
+
+    function filterTransactions(filter) {
+        if (currentTable === 'ledger') return;
+
+        currentFilter = filter;
+        currentPage = 1;
+
+        // Update filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.filter === filter) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Filter data
+        if (filter === 'all') {
+            filteredData = [...tableData[currentTable]];
+        } else {
+            filteredData = tableData[currentTable].filter(item => item.status === filter);
+        }
+
+        renderTable();
+        updatePagination();
+    }
+
+    function applyLedgerFilters() {
+        if (currentTable !== 'ledger') return;
+
+        const glName = document.getElementById('gl-name').value;
+        const fromDate = document.getElementById('from-date').value;
+        const toDate = document.getElementById('to-date').value;
+
+        let data = [...tableData.ledger];
+
+        if (glName) {
+            data = data.filter(item => item.type.toLowerCase().includes(glName));
+        }
+
+        if (fromDate) {
+            data = data.filter(item => new Date(item.date) >= new Date(fromDate));
+        }
+
+        if (toDate) {
+            data = data.filter(item => new Date(item.date) <= new Date(toDate));
+        }
+
+        filteredData = data;
+        currentPage = 1;
+        renderTable();
+        updatePagination();
+    }
+
+    function searchTransactions() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        
+        if (searchTerm === '') {
+            if (currentTable === 'ledger') {
+                applyLedgerFilters();
+            } else {
+                filterTransactions(currentFilter);
+            }
+            return;
+        }
+
+        const searchFields = {
+            sales: ['customer', 'docId', 'invoiceNumber', 'type'],
+            purchase: ['supplier', 'invoiceNumber', 'type'],
+            expenses: ['supplier', 'docId', 'type'],
+            payments: ['partyName', 'narration', 'mode'],
+            other: ['type', 'narration'],
+            ledger: ['type', 'narration']
+        };
+
+        const fields = searchFields[currentTable];
+        filteredData = tableData[currentTable].filter(item => {
+            return fields.some(field => 
+                item[field] && item[field].toLowerCase().includes(searchTerm)
+            );
+        });
+
+        currentPage = 1;
+        renderTable();
+        updatePagination();
+    }
+
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredData.length / recordsPerPage);
+        const start = (currentPage - 1) * recordsPerPage + 1;
+        const end = Math.min(currentPage * recordsPerPage, filteredData.length);
+
+        document.getElementById('showing-start').textContent = filteredData.length > 0 ? start : 0;
+        document.getElementById('showing-end').textContent = end;
+        document.getElementById('total-records').textContent = filteredData.length;
+
+        // Update prev/next buttons
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages || totalPages === 0;
+
+        // Generate page numbers
+        const pageNumbers = document.getElementById('page-numbers');
+        pageNumbers.innerHTML = '';
+
+        for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.textContent = i;
+            pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+            pageBtn.onclick = () => goToPage(i);
+            pageNumbers.appendChild(pageBtn);
+        }
+    }
+
+    function changePage(direction) {
+        const totalPages = Math.ceil(filteredData.length / recordsPerPage);
+        const newPage = currentPage + direction;
+        
+        if (newPage >= 1 && newPage <= totalPages) {
+            currentPage = newPage;
+            renderTable();
+            updatePagination();
+        }
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        renderTable();
+        updatePagination();
+    }
+
+    // Action functions
+    function viewRecord(id) {
+        const record = filteredData.find(r => r.id === id);
+        alert(`Viewing ${currentTable} record ID: ${id}\n${JSON.stringify(record, null, 2)}`);
+    }
+
+    function editRecord(id) {
+        alert(`Edit ${currentTable} record ID: ${id}`);
+    }
+
+    function deleteRecord(id) {
+        if (confirm('Are you sure you want to delete this record?')) {
+            // Remove from both arrays
+            const originalIndex = tableData[currentTable].findIndex(r => r.id === id);
+            if (originalIndex > -1) {
+                tableData[currentTable].splice(originalIndex, 1);
+            }
+            
+            const filteredIndex = filteredData.findIndex(r => r.id === id);
+            if (filteredIndex > -1) {
+                filteredData.splice(filteredIndex, 1);
+            }
+            
+            renderTable();
+            updatePagination();
+            alert('Record deleted successfully');
+        }
+    }
+
+    function addNewTransaction() {
+        alert(`Add new ${currentTable} transaction`);
+    }
+
+    function exportTransactions() {
+        const config = tableConfig[currentTable];
+        const headers = config.headers.filter(h => h !== 'Actions');
+        const columns = config.columns.filter(c => c !== 'actions');
+        
+        const csvContent = [
+            headers.join(','),
+            ...filteredData.map(row => 
+                columns.map(col => {
+                    if (col === 'id') return filteredData.indexOf(row) + 1;
+                    return typeof row[col] === 'string' ? `"${row[col]}"` : (row[col] || '');
+                }).join(',')
+            )
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentTable}_transactions_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        alert('Export completed successfully!');
+    }
+
+    // Utility functions
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-IN', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric' 
+        });
+    }
+
+    function capitalizeFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function sortTable(column) {
+        // Implement sorting functionality
+        console.log(`Sorting by ${column}`);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,423 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard - FinanceFlow{% endblock %}
+
+{% block page_title %}Financial Dashboard{% endblock %}
+{% block page_subtitle %}Real-time financial operations overview{% endblock %}
+
+{% block extra_css %}
+  .card-image {
+            width: 115px;
+            height: 115px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+{% endblock %}
+{% block content %}
+<div class="p-4 space-y-6">
+    <!-- Compact Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Invoice Card -->
+       <!-- Modified Invoice Card - Enhanced Text, Keep card-image Size -->
+<div class="card-compact p-4">
+
+    <div class="flex items-start space-x-3">
+        <!-- Image on the left - CARD-IMAGE SIZE MAINTAINED -->
+        <div class="flex-shrink-0">
+            <!-- REPLACE THIS SRC WITH YOUR INVOICE IMAGE -->
+            <img src="{{ url_for('static', path='invoices.png') }}" alt="Invoice" class="card-image" />
+            <!-- Fallback icon in case image doesn't load -->
+            <div class="hidden w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                <i class="fas fa-file-invoice text-blue-600 text-sm"></i>
+            </div>
+        </div>
+        
+        <!-- Information on the right - ENHANCED TEXT -->
+        <div class="flex-1 space-y-1.5">
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-700">Submitted for Processing</span>
+                <span class="text-base font-bold text-blue-600">847</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-700">Ready for Posting</span>
+                <span class="text-base font-bold text-green-600">1,245</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-700">Posted</span>
+                <span class="text-base font-bold text-purple-600">692</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-700">Exception</span>
+                <span class="text-base font-bold text-red-600">63</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+        
+        <!-- Books Status Card -->
+     <!-- Books Status Card - Flex Row Layout with Image and Data Side by Side -->
+<div class="card-compact p-4">
+    <div class="flex items-center space-x-4">
+        <!-- Image on the left -->
+        <div class="flex-shrink-0">
+            <!-- REPLACE THIS SRC WITH YOUR BOOKS IMAGE -->
+            <img src="{{ url_for('static', path='books.png') }}" alt="Books" class="card-image" />
+            <!-- Fallback icon in case image doesn't load -->
+            <div class="hidden w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                <i class="fas fa-book text-green-600 text-sm"></i>
+            </div>
+        </div>
+        
+        <!-- Books Data in Row Layout beside image -->
+        <div class="flex space-x-8">
+            <!-- Closed Books -->
+            <div class="flex flex-col items-center">
+                <span class="text-2xl font-bold text-green-600">34</span>
+                <span class="text-sm font-medium text-gray-600 uppercase tracking-wide">Closed</span>
+            </div>
+            
+            <!-- Pending Books -->
+            <div class="flex flex-col items-center">
+                <span class="text-2xl font-bold text-orange-600">6</span>
+                <span class="text-sm font-medium text-gray-600 uppercase tracking-wide">Pending</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+        
+        <!-- Next Posting Card -->
+        <div class="card-compact p-4">
+            <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Next Posting</p>
+                <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-calendar-alt text-purple-600 text-sm"></i>
+                </div>
+            </div>
+            <div class="space-y-1">
+                <div class="flex justify-between">
+                    <span class="text-xs text-gray-600">Sales</span>
+                    <span class="text-xs font-semibold text-gray-900">₹25.0L</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-xs text-gray-600">Purchases</span>
+                    <span class="text-xs font-semibold text-gray-900">₹18.2L</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-xs text-gray-600">Expenses</span>
+                    <span class="text-xs font-semibold text-gray-900">₹8.5L</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-xs text-gray-600">Others</span>
+                    <span class="text-xs font-semibold text-gray-900">₹3.2L</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bank Statements Summary -->
+    <div class="card-compact p-4">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-gray-900">Bank Statements Processing</h3>
+            <div class="text-xs text-gray-500">Updated 2 min ago</div>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-upload text-gray-600 text-sm"></i>
+                </div>
+                <p class="text-lg font-bold text-gray-900">156</p>
+                <p class="text-xs text-gray-500">Submitted</p>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-check-circle text-blue-600 text-sm"></i>
+                </div>
+                <p class="text-lg font-bold text-blue-600">142</p>
+                <p class="text-xs text-gray-500">Verified</p>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-sm"></i>
+                </div>
+                <p class="text-lg font-bold text-red-600">8</p>
+                <p class="text-xs text-gray-500">Exceptions</p>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-cogs text-green-600 text-sm"></i>
+                </div>
+                <p class="text-lg font-bold text-green-600">128</p>
+                <p class="text-xs text-gray-500">Processed</p>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-check-double text-purple-600 text-sm"></i>
+                </div>
+                <p class="text-lg font-bold text-purple-600">115</p>
+                <p class="text-xs text-gray-500">Posted</p>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                <span>Overall Progress</span>
+                <span>87.8%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                <div class="bg-blue-600 h-1.5 rounded-full" style="width: 87.8%"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Transactions -->
+    <div class="card-compact">
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-semibold text-gray-900">Recent Transactions</h3>
+                <div class="flex items-center space-x-2">
+                    <select class="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <option>Last 7 days</option>
+                        <option>Last 30 days</option>
+                    </select>
+                    <button class="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors">
+                        Export
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="table-compact w-full">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Customer/Vendor</th>
+                        <th class="text-right">Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-medium">Aug 20</td>
+                        <td class="font-mono text-xs">INV-1247</td>
+                        <td>
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700">
+                                Invoice
+                            </span>
+                        </td>
+                        <td>Acme Corporation</td>
+                        <td class="text-right font-semibold">₹12,45,000</td>
+                        <td><span class="status-badge status-processed">Processed</span></td>
+                        <td>
+                            <button class="p-1 hover:bg-gray-100 rounded">
+                                <i class="fas fa-eye text-gray-400 hover:text-gray-600 text-xs"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Aug 19</td>
+                        <td class="font-mono text-xs">PO-892</td>
+                        <td>
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-50 text-purple-700">
+                                Purchase
+                            </span>
+                        </td>
+                        <td>Tech Suppliers</td>
+                        <td class="text-right font-semibold">₹8,75,000</td>
+                        <td><span class="status-badge status-verified">Verified</span></td>
+                        <td>
+                            <button class="p-1 hover:bg-gray-100 rounded">
+                                <i class="fas fa-eye text-gray-400 hover:text-gray-600 text-xs"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Aug 18</td>
+                        <td class="font-mono text-xs">EXP-421</td>
+                        <td>
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-50 text-orange-700">
+                                Expense
+                            </span>
+                        </td>
+                        <td>Office Maintenance</td>
+                        <td class="text-right font-semibold">₹45,000</td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                        <td>
+                            <button class="p-1 hover:bg-gray-100 rounded">
+                                <i class="fas fa-eye text-gray-400 hover:text-gray-600 text-xs"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Aug 17</td>
+                        <td class="font-mono text-xs">INV-246</td>
+                        <td>
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700">
+                                Invoice
+                            </span>
+                        </td>
+                        <td>Beta Enterprises</td>
+                        <td class="text-right font-semibold">₹6,80,000</td>
+                        <td><span class="status-badge status-exception">Exception</span></td>
+                        <td>
+                            <button class="p-1 hover:bg-gray-100 rounded">
+                                <i class="fas fa-eye text-gray-400 hover:text-gray-600 text-xs"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="card-compact p-4">
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">Processing Status</h3>
+            <div class="chart-container">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+        <div class="card-compact p-4">
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">Monthly Trends</h3>
+            <div class="chart-container">
+                <canvas id="trendsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize Charts
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusChart = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Posted', 'Processed', 'Verified', 'Submitted', 'Exceptions'],
+            datasets: [{
+                data: [115, 128, 142, 156, 8],
+                backgroundColor: [
+                    '#8b5cf6',
+                    '#10b981',
+                    '#3b82f6',
+                    '#6b7280',
+                    '#ef4444'
+                ],
+                borderWidth: 0,
+                cutout: '60%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 10,
+                            family: 'Inter'
+                        },
+                        color: '#374151'
+                    }
+                }
+            }
+        }
+    });
+    
+    const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+    const trendsChart = new Chart(trendsCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+            datasets: [
+                {
+                    label: 'Invoices',
+                    data: [320, 410, 380, 450, 520, 480, 590, 620],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                },
+                {
+                    label: 'Books',
+                    data: [28, 35, 32, 38, 42, 40, 45, 48],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 10,
+                            family: 'Inter'
+                        },
+                        color: '#374151'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#f3f4f6'
+                    },
+                    ticks: {
+                        font: {
+                            size: 9,
+                            family: 'Inter'
+                        },
+                        color: '#6b7280'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 9,
+                            family: 'Inter'
+                        },
+                        color: '#6b7280'
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

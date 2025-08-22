@@ -1,0 +1,800 @@
+{% extends "base.html" %}
+
+{% block title %}Books Management - FinanceFlow{% endblock %}
+{% block page_title %}Books Management{% endblock %}
+{% block page_subtitle %}Manage your monthly accounting books and records{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f8fafc;
+        color: #374151;
+    }
+
+    .filter-container {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .filter-select {
+        background-color: #ffffff;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+        color: #374151;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .fetch-btn {
+        background-color: #2563eb;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .fetch-btn:hover {
+        background-color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    .fetch-btn:disabled {
+        background-color: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .placeholder-section {
+        background-color: #ffffff;
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 4rem 2rem;
+        text-align: center;
+        margin: 2rem 0;
+    }
+
+    .placeholder-section.hidden {
+        display: none;
+    }
+
+    .month-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        height: 180px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .month-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .month-card.selected {
+        border-color: #2563eb;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+    }
+
+    .month-card.closed {
+        border-left: 4px solid #10b981;
+    }
+
+    .month-card.open {
+        border-left: 4px solid #ef4444;
+    }
+
+    .book-image {
+        width: 75px;
+        height: 75px;
+        margin-bottom: 0.75rem;
+        opacity: 0.8;
+    }
+
+    .month-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0.5rem 0;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .status-badge.closed {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-badge.open {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .cards-grid {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.4s ease;
+    }
+
+    .cards-grid.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .details-container {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-top: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.4s ease;
+    }
+
+    .details-container.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .book-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .book-icon {
+        width: 64px;
+        height: 64px;
+        background-color: #f3f4f6;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1.5rem;
+    }
+
+    .book-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .book-status {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+
+    .stat-card {
+        background-color: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transform: translateY(-1px);
+    }
+
+    .stat-card.posted {
+        border-left: 4px solid #10b981;
+    }
+
+    .stat-card.deleted {
+        border-left: 4px solid #ef4444;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon.posted {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .stat-icon.deleted {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .stat-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-amount {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+    }
+
+    .accountant-message {
+        background-color: #fffbeb;
+        border: 1px solid #fbbf24;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .message-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .message-icon {
+        width: 40px;
+        height: 40px;
+        background-color: #fbbf24;
+        color: #ffffff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+
+    .message-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #92400e;
+    }
+
+    .message-text {
+        color: #92400e;
+        line-height: 1.6;
+        font-size: 0.875rem;
+    }
+
+    .actions-sidebar {
+        background-color: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .action-btn {
+        width: 100%;
+        background-color: #2563eb;
+        color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        margin-bottom: 0.75rem;
+        transition: background-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .action-btn:hover {
+        background-color: #1d4ed8;
+    }
+
+    .action-btn i {
+        margin-right: 0.5rem;
+    }
+
+    .summary-stats {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .summary-stats h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .summary-label {
+        color: #6b7280;
+    }
+
+    .summary-value {
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .loading-icon {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Filter Section -->
+    <div class="filter-container">
+        <div class="flex flex-wrap items-end gap-6">
+            <div class="flex-1 min-w-48">
+                <label for="year-select" class="block text-sm font-medium text-gray-700 mb-2">
+                    Financial Year
+                </label>
+                <select id="year-select" class="filter-select w-full">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                </select>
+            </div>
+            
+            <div class="flex-1 min-w-48">
+                <label for="status-select" class="block text-sm font-medium text-gray-700 mb-2">
+                    Book Status
+                </label>
+                <select id="status-select" class="filter-select w-full">
+                    <option value="all">All Books</option>
+                    <option value="closed">Closed Only</option>
+                    <option value="open">Open Only</option>
+                </select>
+            </div>
+            
+            <button id="fetch-btn" class="fetch-btn">
+                <span id="btn-text">Apply Filters</span>
+                <i class="fas fa-spinner loading-icon ml-2 hidden" id="loading-icon"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Initial Placeholder -->
+    <div class="placeholder-section" id="initial-placeholder">
+        <div class="max-w-2xl mx-auto">
+            <img src="/static/not_found.jpg" alt="Select filters" class="w-48 h-48 mx-auto mb-6 opacity-50">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Select Filters to View Books</h2>
+            <p class="text-gray-600 text-lg">
+                Choose your desired financial year and book status from the filters above, 
+                then click "Apply Filters" to display the monthly accounting records.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Books Grid -->
+    <div class="cards-grid hidden" id="books-grid">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" id="cards-container">
+            <!-- Cards will be dynamically inserted here -->
+        </div>
+    </div>
+    
+    <!-- Book Selection Placeholder -->
+    <div class="placeholder-section hidden" id="selection-placeholder">
+        <div class="max-w-2xl mx-auto">
+            <img src="/static/not_found.jpg" alt="Select a book" class="w-48 h-48 mx-auto mb-6 opacity-50">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Select a Book to View Details</h2>
+            <p class="text-gray-600 text-lg">
+                Click on any month card above to view detailed information including 
+                invoice statistics and accountant notes.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Book Details Container -->
+    <div class="details-container hidden" id="book-details">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Content -->
+            <div class="lg:col-span-2">
+                <!-- Book Header -->
+                <div class="book-header">
+                    <div class="book-icon" id="selected-book-icon">
+                        <img src="/static/book.png" alt="Book" class="w-12 h-12">
+                    </div>
+                    <div>
+                        <h3 class="book-title" id="selected-book-title">Book Details</h3>
+                        <div class="book-status">
+                            <span id="status-text">Status</span>
+                            <span class="text-gray-400">• Updated Aug 21, 2025</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <!-- Posted Invoices -->
+                    <div class="stat-card posted">
+                        <div class="stat-icon posted">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-title">Posted Invoices</div>
+                        <div class="stat-value" id="posted-count">0</div>
+                        <div class="stat-amount">Amount: <span id="posted-amount">₹0</span></div>
+                    </div>
+                    
+                    <!-- Deleted Invoices -->
+                    <div class="stat-card deleted">
+                        <div class="stat-icon deleted">
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
+                        <div class="stat-title">Deleted Invoices</div>
+                        <div class="stat-value" id="deleted-count">0</div>
+                        <div class="stat-amount">Amount: <span id="deleted-amount">₹0</span></div>
+                    </div>
+                </div>
+                
+                <!-- Accountant Message -->
+                <div class="accountant-message hidden" id="accountant-message">
+                    <div class="message-header">
+                        <div class="message-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="message-title">Accountant's Note</div>
+                    </div>
+                    <div class="message-text" id="accountant-message-text">
+                        Message content will appear here...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="actions-sidebar">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+                    
+                    <button class="action-btn">
+                        <i class="fas fa-download"></i>
+                        Download Report
+                    </button>
+                    
+                    <button class="action-btn">
+                        <i class="fas fa-file-export"></i>
+                        Export to PDF
+                    </button>
+                    
+                    <button class="action-btn">
+                        <i class="fas fa-envelope"></i>
+                        Email Summary
+                    </button>
+                    
+                    <button class="action-btn">
+                        <i class="fas fa-comments"></i>
+                        Contact Accountant
+                    </button>
+                    
+                    <!-- Summary Stats -->
+                    <div class="summary-stats">
+                        <h4>Monthly Summary</h4>
+                        <div class="summary-row">
+                            <span class="summary-label">Total Entries:</span>
+                            <span class="summary-value" id="total-entries">0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Net Amount:</span>
+                            <span class="summary-value" id="net-amount">₹0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Success Rate:</span>
+                            <span class="summary-value" id="success-rate">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let selectedMonth = null;
+    let filteredData = {};
+    
+    const monthsData = {
+        // Closed Books
+        january: {
+            name: 'January',
+            status: 'closed',
+            posted: { count: 156, amount: 2450000 },
+            deleted: { count: 12, amount: 185000 },
+            note: ''
+        },
+        march: {
+            name: 'March',
+            status: 'closed',
+            posted: { count: 189, amount: 3200000 },
+            deleted: { count: 8, amount: 120000 },
+            note: ''
+        },
+        april: {
+            name: 'April',
+            status: 'closed',
+            posted: { count: 203, amount: 2890000 },
+            deleted: { count: 15, amount: 240000 },
+            note: ''
+        },
+        july: {
+            name: 'July',
+            status: 'closed',
+            posted: { count: 178, amount: 3450000 },
+            deleted: { count: 6, amount: 95000 },
+            note: ''
+        },
+        september: {
+            name: 'September',
+            status: 'closed',
+            posted: { count: 167, amount: 2980000 },
+            deleted: { count: 11, amount: 175000 },
+            note: ''
+        },
+        november: {
+            name: 'November',
+            status: 'closed',
+            posted: { count: 145, amount: 2650000 },
+            deleted: { count: 9, amount: 140000 },
+            note: ''
+        },
+        
+        // Open Books
+        february: {
+            name: 'February',
+            status: 'open',
+            posted: { count: 134, amount: 2100000 },
+            deleted: { count: 18, amount: 285000 },
+            note: 'Waiting for final GST reconciliation. Three invoices need vendor confirmation before we can close this month.'
+        },
+        may: {
+            name: 'May',
+            status: 'open',
+            posted: { count: 198, amount: 3850000 },
+            deleted: { count: 7, amount: 110000 },
+            note: 'Annual audit requirements pending. Need to verify depreciation calculations and fixed asset additions.'
+        },
+        june: {
+            name: 'June',
+            status: 'open',
+            posted: { count: 212, amount: 4100000 },
+            deleted: { count: 13, amount: 195000 },
+            note: 'Quarter-end adjustments in progress. Accrued expenses and prepaid items need final review.'
+        },
+        august: {
+            name: 'August',
+            status: 'open',
+            posted: { count: 187, amount: 3650000 },
+            deleted: { count: 22, amount: 340000 },
+            note: 'Current month - still accepting entries. Bank reconciliation pending for last week.'
+        },
+        october: {
+            name: 'October',
+            status: 'open',
+            posted: { count: 156, amount: 2850000 },
+            deleted: { count: 16, amount: 225000 },
+            note: 'Festival season adjustments required. Multiple inter-company transactions need approval.'
+        },
+        december: {
+            name: 'December',
+            status: 'open',
+            posted: { count: 203, amount: 4200000 },
+            deleted: { count: 19, amount: 310000 },
+            note: 'Year-end closing procedures initiated. Tax planning adjustments and annual provisions under review.'
+        }
+    };
+    
+    // Event delegation for dynamically created cards
+    document.addEventListener('click', function(event) {
+        const card = event.target.closest('.month-card');
+        if (!card) return;
+        
+        const monthId = card.id.replace('-card', '');
+        if (monthId && monthsData[monthId]) {
+            selectMonth(monthId);
+        }
+    });
+    
+    function createMonthCard(monthId, monthData) {
+        const card = document.createElement('div');
+        card.className = `month-card ${monthData.status} animate-fade-in`;
+        card.id = `${monthId}-card`;
+        
+        card.innerHTML = `
+            <img src="/static/book.png" alt="Book" class="book-image">
+            <div class="month-title">${monthData.name}</div>
+            <span class="status-badge ${monthData.status}">${monthData.status.toUpperCase()}</span>
+        `;
+        
+        return card;
+    }
+    
+    function selectMonth(monthId) {
+        if (!monthsData[monthId]) return;
+        
+        // Remove previous selection
+        document.querySelectorAll('.month-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Add selection to clicked card
+        const selectedCard = document.getElementById(`${monthId}-card`);
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
+        }
+        
+        selectedMonth = monthId;
+        const month = monthsData[monthId];
+        
+        // Hide selection placeholder
+        document.getElementById('selection-placeholder').classList.add('hidden');
+        
+        // Update book details
+        document.getElementById('selected-book-title').textContent = `${month.name} 2025 Book`;
+        document.getElementById('status-text').textContent = month.status === 'closed' ? 'Book Closed' : 'Book Open';
+        
+        // Update statistics
+        document.getElementById('posted-count').textContent = month.posted.count;
+        document.getElementById('posted-amount').textContent = '₹' + month.posted.amount.toLocaleString();
+        document.getElementById('deleted-count').textContent = month.deleted.count;
+        document.getElementById('deleted-amount').textContent = '₹' + month.deleted.amount.toLocaleString();
+        
+        // Update summary
+        const totalEntries = month.posted.count + month.deleted.count;
+        const netAmount = month.posted.amount - month.deleted.amount;
+        const successRate = Math.round((month.posted.count / totalEntries) * 100);
+        
+        document.getElementById('total-entries').textContent = totalEntries;
+        document.getElementById('net-amount').textContent = '₹' + netAmount.toLocaleString();
+        document.getElementById('success-rate').textContent = successRate + '%';
+        
+        // Show/hide accountant message
+        const accountantMessage = document.getElementById('accountant-message');
+        if (month.status === 'open' && month.note) {
+            accountantMessage.classList.remove('hidden');
+            document.getElementById('accountant-message-text').textContent = month.note;
+        } else {
+            accountantMessage.classList.add('hidden');
+        }
+        
+        // Show details container
+        setTimeout(() => {
+            document.getElementById('book-details').classList.remove('hidden');
+            document.getElementById('book-details').classList.add('show');
+        }, 200);
+    }
+    
+    function resetSelection() {
+        document.querySelectorAll('.month-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        document.getElementById('book-details').classList.remove('show');
+        document.getElementById('book-details').classList.add('hidden');
+        document.getElementById('selection-placeholder').classList.remove('hidden');
+        
+        selectedMonth = null;
+    }
+    
+    document.getElementById('fetch-btn').addEventListener('click', function() {
+        const year = document.getElementById('year-select').value;
+        const status = document.getElementById('status-select').value;
+        const btn = document.getElementById('fetch-btn');
+        const btnText = document.getElementById('btn-text');
+        const loadingIcon = document.getElementById('loading-icon');
+        
+        // Show loading state
+        btn.disabled = true;
+        btnText.textContent = 'Loading...';
+        loadingIcon.classList.remove('hidden');
+        
+        // Reset any previous selection
+        resetSelection();
+        
+        // Simulate API call
+        setTimeout(() => {
+            // Filter data based on selection
+            filteredData = {};
+            Object.entries(monthsData).forEach(([key, value]) => {
+                if (status === 'all' || value.status === status) {
+                    filteredData[key] = value;
+                }
+            });
+            
+            // Hide initial placeholder
+            document.getElementById('initial-placeholder').classList.add('hidden');
+            
+            // Clear previous cards
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            
+            // Show books grid
+            const booksGrid = document.getElementById('books-grid');
+            booksGrid.classList.remove('hidden');
+            
+            // Create and append cards
+            Object.entries(filteredData).forEach(([monthId, monthData]) => {
+                const card = createMonthCard(monthId, monthData);
+                container.appendChild(card);
+            });
+            
+            // Show cards grid with animation
+            setTimeout(() => {
+                booksGrid.classList.add('show');
+            }, 100);
+            
+            // Show selection placeholder
+            document.getElementById('selection-placeholder').classList.remove('hidden');
+            
+            // Reset button state
+            btn.disabled = false;
+            btnText.textContent = 'Apply Filters';
+            loadingIcon.classList.add('hidden');
+            
+        }, 1000);
+    });
+</script>
+{% endblock %}

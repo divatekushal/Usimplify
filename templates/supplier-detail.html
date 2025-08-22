@@ -1,0 +1,1097 @@
+{% extends "base.html" %}
+
+{% block title %}{{ supplier.name }} - Supplier Details - FinanceFlow{% endblock %}
+{% block page_title %}{{ supplier.name }}{% endblock %}
+{% block page_subtitle %}Supplier Details & Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f8fafc;
+        color: #374151;
+    }
+
+    .detail-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .detail-card:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .info-value {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        word-break: break-word;
+    }
+
+    .info-value.amount {
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 1.25rem;
+    }
+
+    .info-value.positive { color: #059669; }
+    .info-value.negative { color: #dc2626; }
+    .info-value.zero { color: #6b7280; }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .breadcrumb a {
+        color: #2563eb;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        font-weight: 600;
+    }
+
+    .breadcrumb a:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+
+    .breadcrumb-separator {
+        color: #9ca3af;
+        font-weight: 400;
+    }
+
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(40%, -40%);
+    }
+
+    .stat-card.green {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .stat-card.blue {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .stat-card.purple {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    }
+
+    .stat-card.orange {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+        font-weight: 500;
+    }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .orders-table th {
+        background-color: #f8fafc;
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .orders-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f3f4f6;
+        color: #374151;
+        font-size: 0.875rem;
+    }
+
+    .orders-table tr:hover td {
+        background-color: #f9fafb;
+    }
+
+    .orders-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.875rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .status-completed {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-pending {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-processing {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+
+    .contact-form {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border: 2px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .contact-form:hover {
+        border-color: #2563eb;
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background-color: #ffffff;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+    }
+
+    .action-button {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    }
+
+    .action-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
+    }
+
+    .action-button.secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        box-shadow: 0 4px 15px rgba(107, 114, 128, 0.4);
+    }
+
+    .action-button.secondary:hover {
+        box-shadow: 0 8px 25px rgba(107, 114, 128, 0.6);
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .service-card {
+        background-color: #ffffff;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+    }
+
+    .service-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        border-color: #2563eb;
+    }
+
+    .service-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .service-description {
+        color: #6b7280;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+
+    .contact-info-card {
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        border: 2px solid #10b981;
+        border-radius: 16px;
+        padding: 2rem;
+    }
+
+    .contact-method {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .contact-method:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+        transform: translateX(8px);
+    }
+
+    .contact-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 1.25rem;
+    }
+
+    .contact-icon.phone {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .contact-icon.email {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .contact-icon.address {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    }
+
+    .query-success {
+        background-color: #d1fae5;
+        border: 1px solid #10b981;
+        color: #065f46;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .quick-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .detail-card {
+            padding: 1.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="/suppliers">← Back to Suppliers</a>
+        <span class="breadcrumb-separator">›</span>
+        <span class="font-medium text-gray-900" id="detail-breadcrumb">Supplier Details</span>
+    </nav>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+        <div class="stat-card blue">
+            <div class="stat-value" id="total-orders">0</div>
+            <div class="stat-label">Total Orders</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-value" id="total-payable">₹0</div>
+            <div class="stat-label">Total Payable</div>
+        </div>
+        <div class="stat-card purple">
+            <div class="stat-value" id="amount-paid">₹0</div>
+            <div class="stat-label">Amount Paid</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="stat-value" id="balance-due">₹0</div>
+            <div class="stat-label">Balance Due</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Supplier Information -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-building text-blue-600"></i>
+                        Supplier Information
+                    </h2>
+                </div>
+                
+                <div class="info-grid" id="supplier-info-grid">
+                    <!-- Info will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-shopping-cart text-green-600"></i>
+                        Recent Orders
+                    </h2>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody">
+                            <!-- Orders will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Supplied Goods & Services -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-boxes text-purple-600"></i>
+                        Supplied Goods & Services
+                    </h2>
+                </div>
+                
+                <div class="services-grid" id="services-grid">
+                    <!-- Services will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1 space-y-8">
+            <!-- Contact Information -->
+            <div class="contact-info-card">
+                <h3 class="text-xl font-bold text-green-800 mb-6 flex items-center">
+                    <i class="fas fa-address-book mr-3"></i>
+                    Contact Information
+                </h3>
+                
+                <div id="contact-methods">
+                    <!-- Contact methods will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Query Box -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3 class="card-title text-lg">
+                        <i class="fas fa-question-circle text-orange-600"></i>
+                        Contact Accountant
+                    </h3>
+                </div>
+                
+                <div class="query-success" id="query-success">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Your query has been sent successfully! Our accountant will respond within 24 hours.
+                </div>
+                
+                <form class="contact-form" onsubmit="submitQuery(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="query-subject">Subject</label>
+                        <select class="form-input" id="query-subject" required>
+                            <option value="">Select Issue Type</option>
+                            <option value="payment_discrepancy">Payment Discrepancy</option>
+                            <option value="invoice_query">Invoice Query</option>
+                            <option value="delivery_issue">Delivery Issue</option>
+                            <option value="quality_concern">Quality Concern</option>
+                            <option value="pricing_inquiry">Pricing Inquiry</option>
+                            <option value="contract_terms">Contract Terms</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="query-priority">Priority Level</label>
+                        <select class="form-input" id="query-priority" required>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="query-message">Detailed Message</label>
+                        <textarea class="form-input form-textarea" id="query-message" rows="5" 
+                                  placeholder="Please describe the issue in detail..." required></textarea>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button type="submit" class="action-button">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Query
+                        </button>
+                        <button type="button" class="action-button secondary" onclick="clearForm()">
+                            <i class="fas fa-times"></i>
+                            Clear
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3 class="card-title text-lg">
+                        <i class="fas fa-bolt text-yellow-600"></i>
+                        Quick Actions
+                    </h3>
+                </div>
+                
+                <div class="space-y-3">
+                    <button class="action-button w-full">
+                        <i class="fas fa-file-invoice"></i>
+                        Generate Statement
+                    </button>
+                    
+                    <button class="action-button secondary w-full">
+                        <i class="fas fa-download"></i>
+                        Download Reports
+                    </button>
+                    
+                    <button class="action-button secondary w-full">
+                        <i class="fas fa-edit"></i>
+                        Edit Supplier
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Complete supplier data with detailed information
+    const supplierDetailData = {
+        1: {
+            id: 1,
+            name: 'Alpha Steel Industries',
+            code: 'ASI001',
+            ledger: 'Alpha Steel - Raw Materials',
+            payable: 1250000,
+            paid: 850000,
+            balance: 400000,
+            since: 'March 15, 2020',
+            contact_person: 'Rajesh Kumar',
+            phone: '+91 98765 43210',
+            email: 'rajesh@alphasteel.com',
+            address: '123 Industrial Area, Sector 45, Gurugram, Haryana - 122003',
+            gst_number: '06AAACA1234B1Z5',
+            gst_type: 'Regular',
+            state_code: '06 - Haryana',
+            gst_reg_date: 'March 20, 2020',
+            total_orders: 48,
+            credit_limit: 2000000,
+            payment_terms: 30,
+            last_payment_date: 'Aug 15, 2025',
+            last_payment_amount: 125000,
+            orders: [
+                { id: 'PO001', date: '2025-08-15', description: 'Steel Rods & Plates', amount: 125000, status: 'completed' },
+                { id: 'PO002', date: '2025-08-10', description: 'Raw Material Supply', amount: 89000, status: 'processing' },
+                { id: 'PO003', date: '2025-08-05', description: 'Industrial Hardware', amount: 156000, status: 'pending' },
+                { id: 'PO004', date: '2025-07-28', description: 'Steel Fabrication', amount: 234000, status: 'completed' },
+                { id: 'PO005', date: '2025-07-20', description: 'Construction Materials', amount: 178000, status: 'completed' },
+                { id: 'PO006', date: '2025-07-15', description: 'Machine Parts', amount: 95000, status: 'completed' }
+            ],
+            services: [
+                {
+                    title: 'Raw Material Supply',
+                    description: 'High-quality steel, iron, and metal components for manufacturing processes with certified quality standards.',
+                    icon: 'fas fa-industry'
+                },
+                {
+                    title: 'Custom Fabrication',
+                    description: 'Specialized steel cutting, welding, and fabrication services as per client specifications and drawings.',
+                    icon: 'fas fa-tools'
+                },
+                {
+                    title: 'Quality Testing',
+                    description: 'Comprehensive material testing and quality assurance with ISO certified reports and documentation.',
+                    icon: 'fas fa-certificate'
+                },
+                {
+                    title: 'Logistics Support',
+                    description: 'Complete logistics and transportation solutions for timely delivery of materials to project sites.',
+                    icon: 'fas fa-truck'
+                }
+            ],
+            recent_activities: [
+                { description: 'Payment received ₹1,25,000', date: 'Aug 15, 2025' },
+                { description: 'Purchase Order PO002 created', date: 'Aug 10, 2025' },
+                { description: 'Quality certificate updated', date: 'Aug 08, 2025' },
+                { description: 'Credit limit reviewed', date: 'Aug 05, 2025' }
+            ]
+        },
+        2: {
+            id: 2,
+            name: 'Beta Electronics Ltd',
+            code: 'BEL002',
+            ledger: 'Beta Electronics - Components',
+            payable: 890000,
+            paid: 890000,
+            balance: 0,
+            since: 'June 10, 2020',
+            contact_person: 'Priya Sharma',
+            phone: '+91 98765 43211',
+            email: 'priya@betaelectronics.com',
+            address: '456 Electronic City, Phase 2, Bangalore, Karnataka - 560100',
+            gst_number: '29BETAB5678C1Z2',
+            gst_type: 'Regular',
+            state_code: '29 - Karnataka',
+            gst_reg_date: 'June 15, 2020',
+            total_orders: 32,
+            credit_limit: 1500000,
+            payment_terms: 30,
+            last_payment_date: 'Aug 18, 2025',
+            last_payment_amount: 89000,
+            orders: [
+                { id: 'PO021', date: '2025-08-18', description: 'Electronic Components', amount: 95000, status: 'completed' },
+                { id: 'PO022', date: '2025-08-12', description: 'PCB Boards', amount: 78000, status: 'completed' },
+                { id: 'PO023', date: '2025-08-06', description: 'Semiconductors', amount: 145000, status: 'completed' },
+                { id: 'PO024', date: '2025-07-30', description: 'Circuit Components', amount: 123000, status: 'completed' }
+            ],
+            services: [
+                {
+                    title: 'Electronic Components',
+                    description: 'Wide range of electronic components including resistors, capacitors, ICs, and specialized semiconductors.',
+                    icon: 'fas fa-microchip'
+                },
+                {
+                    title: 'PCB Manufacturing',
+                    description: 'Custom PCB design and manufacturing with quick turnaround times and high-quality standards.',
+                    icon: 'fas fa-circuit-board'
+                },
+                {
+                    title: 'Technical Support',
+                    description: '24/7 technical support and consultation for electronic projects and component selection.',
+                    icon: 'fas fa-headset'
+                }
+            ],
+            recent_activities: [
+                { description: 'Full payment received ₹89,000', date: 'Aug 18, 2025' },
+                { description: 'Order PO024 completed', date: 'Aug 15, 2025' },
+                { description: 'New product catalog shared', date: 'Aug 12, 2025' }
+            ]
+        },
+        3: {
+            id: 3,
+            name: 'Gamma Chemicals Pvt Ltd',
+            code: 'GCP003',
+            ledger: 'Gamma Chemicals - Supplies',
+            payable: 2100000,
+            paid: 1500000,
+            balance: 600000,
+            since: 'January 5, 2021',
+            contact_person: 'Amit Patel',
+            phone: '+91 98765 43212',
+            email: 'amit@gammachemicals.com',
+            address: '789 Chemical Complex, GIDC, Vadodara, Gujarat - 391340',
+            gst_number: '24GAMMA1234D1Z3',
+            gst_type: 'Regular',
+            state_code: '24 - Gujarat',
+            gst_reg_date: 'January 10, 2021',
+            total_orders: 25,
+            credit_limit: 3000000,
+            payment_terms: 45,
+            last_payment_date: 'Aug 12, 2025',
+            last_payment_amount: 185000,
+            orders: [
+                { id: 'PO031', date: '2025-08-16', description: 'Industrial Chemicals', amount: 185000, status: 'completed' },
+                { id: 'PO032', date: '2025-08-08', description: 'Laboratory Reagents', amount: 95000, status: 'processing' },
+                { id: 'PO033', date: '2025-07-25', description: 'Safety Chemicals', amount: 125000, status: 'pending' }
+            ],
+            services: [
+                {
+                    title: 'Industrial Chemicals',
+                    description: 'High-grade industrial chemicals for manufacturing and processing with safety certifications.',
+                    icon: 'fas fa-flask'
+                },
+                {
+                    title: 'Laboratory Supplies',
+                    description: 'Laboratory reagents and analytical grade chemicals for research and quality testing.',
+                    icon: 'fas fa-microscope'
+                },
+                {
+                    title: 'Safety & Compliance',
+                    description: 'Safety training and regulatory compliance support for chemical handling and storage.',
+                    icon: 'fas fa-shield-alt'
+                }
+            ],
+            recent_activities: [
+                { description: 'Safety audit completed', date: 'Aug 16, 2025' },
+                { description: 'New chemical catalog received', date: 'Aug 12, 2025' },
+                { description: 'Compliance certificate renewed', date: 'Aug 08, 2025' }
+            ]
+        }
+    };
+
+    let currentSupplier = null;
+
+    // Initialize page with supplier data from URL or default
+    function initSupplierDetail() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const supplierId = urlParams.get('id') || '1'; // Default to supplier 1 for demo
+        
+        currentSupplier = supplierDetailData[supplierId];
+        if (!currentSupplier) {
+            alert('Supplier not found!');
+            window.location.href = '/suppliers';
+            return;
+        }
+
+        updatePageContent();
+    }
+
+    function updatePageContent() {
+        // Update page title and breadcrumb
+        document.title = `${currentSupplier.name} - Supplier Details`;
+        
+        // Update quick stats
+        document.getElementById('total-orders').textContent = currentSupplier.total_orders;
+        document.getElementById('total-payable').textContent = formatCurrency(currentSupplier.payable);
+        document.getElementById('amount-paid').textContent = formatCurrency(currentSupplier.paid);
+        document.getElementById('balance-due').textContent = formatCurrency(currentSupplier.balance);
+
+        // Update all information sections
+        updateSupplierInfo();
+        updateContactInfo();
+        updateGSTInfo();
+        updateOrdersTable();
+        updateServicesGrid();
+        updateContactMethods();
+        updateRecentActivity();
+    }
+
+    function updateSupplierInfo() {
+        document.getElementById('supplier-info-grid').innerHTML = `
+            <div class="info-item">
+                <span class="info-label">Supplier Name</span>
+                <span class="info-value">${currentSupplier.name}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Supplier Code</span>
+                <span class="info-value">${currentSupplier.code}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Supplier Since</span>
+                <span class="info-value">${currentSupplier.since}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Ledger Name</span>
+                <span class="info-value">${currentSupplier.ledger}</span>
+            </div>
+        `;
+    }
+
+    function updateContactInfo() {
+        document.getElementById('contact-info-grid').innerHTML = `
+            <div class="info-item">
+                <span class="info-label">Primary Contact</span>
+                <span class="info-value">${currentSupplier.contact_person}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Phone Number</span>
+                <span class="info-value">
+                    <a href="tel:${currentSupplier.phone}" class="text-blue-600 hover:underline">${currentSupplier.phone}</a>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Email Address</span>
+                <span class="info-value">
+                    <a href="mailto:${currentSupplier.email}" class="text-blue-600 hover:underline">${currentSupplier.email}</a>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Address</span>
+                <span class="info-value">${currentSupplier.address}</span>
+            </div>
+        `;
+    }
+
+    function updateGSTInfo() {
+        document.getElementById('gst-info-grid').innerHTML = `
+            <div class="info-item">
+                <span class="info-label">GST Number</span>
+                <span class="info-value">${currentSupplier.gst_number}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">GST Type</span>
+                <span class="info-value">${currentSupplier.gst_type}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">State Code</span>
+                <span class="info-value">${currentSupplier.state_code}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Registration Date</span>
+                <span class="info-value">${currentSupplier.gst_reg_date}</span>
+            </div>
+        `;
+    }
+
+    function updateOrdersTable() {
+        const tbody = document.getElementById('orders-tbody');
+        tbody.innerHTML = currentSupplier.orders.map(order => `
+            <tr>
+                <td class="font-mono font-semibold">${order.id}</td>
+                <td>${formatDate(order.date)}</td>
+                <td>${order.description}</td>
+                <td class="font-mono text-right">${formatCurrency(order.amount)}</td>
+                <td>
+                    <span class="status-badge status-${order.status}">
+                        ${capitalizeFirst(order.status)}
+                    </span>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function updateServicesGrid() {
+        document.getElementById('services-grid').innerHTML = currentSupplier.services.map(service => `
+            <div class="service-card">
+                <div class="service-title">
+                    <i class="${service.icon} text-blue-600"></i>
+                    ${service.title}
+                </div>
+                <div class="service-description">
+                    ${service.description}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateContactMethods() {
+        document.getElementById('contact-methods').innerHTML = `
+            <div class="contact-method">
+                <div class="contact-icon phone">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold text-gray-900">${currentSupplier.contact_person}</div>
+                    <div class="text-sm text-gray-600">
+                        <a href="tel:${currentSupplier.phone}" class="hover:text-blue-600">${currentSupplier.phone}</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="contact-method">
+                <div class="contact-icon email">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold text-gray-900">Email</div>
+                    <div class="text-sm text-gray-600">
+                        <a href="mailto:${currentSupplier.email}" class="hover:text-blue-600">${currentSupplier.email}</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="contact-method">
+                <div class="contact-icon address">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-semibold text-gray-900">Address</div>
+                    <div class="text-sm text-gray-600">${currentSupplier.address}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function updateRecentActivity() {
+        if (!currentSupplier.recent_activities) return;
+        
+        document.getElementById('recent-activity').innerHTML = currentSupplier.recent_activities.map(activity => `
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                <div class="flex-1">
+                    <div class="text-sm font-medium text-gray-900">${activity.description}</div>
+                    <div class="text-xs text-gray-500 mt-1">${activity.date}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Query form submission
+    function submitQuery(event) {
+        event.preventDefault();
+        
+        const subject = document.getElementById('query-subject').value;
+        const priority = document.getElementById('query-priority').value;
+        const message = document.getElementById('query-message').value;
+        
+        if (!subject || !priority || !message.trim()) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        // Show loading state
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+        submitBtn.disabled = true;
+
+        // Simulate form submission
+        setTimeout(() => {
+            document.getElementById('query-success').style.display = 'block';
+            clearForm();
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                document.getElementById('query-success').style.display = 'none';
+            }, 5000);
+        }, 2000);
+    }
+
+    function clearForm() {
+        document.getElementById('query-subject').value = '';
+        document.getElementById('query-priority').value = 'low';
+        document.getElementById('query-message').value = '';
+    }
+
+    // Quick action functions
+    function generateStatement() {
+        if (confirm('Generate account statement for ' + currentSupplier.name + '?')) {
+            alert('Account statement generated successfully!');
+        }
+    }
+
+    function downloadReports() {
+        if (confirm('Download supplier reports for ' + currentSupplier.name + '?')) {
+            alert('Reports downloaded successfully!');
+        }
+    }
+
+    function sendPaymentReminder() {
+        if (confirm('Send payment reminder to ' + currentSupplier.name + '?')) {
+            alert('Payment reminder sent successfully!');
+        }
+    }
+
+    function editSupplier() {
+        window.location.href = '/supplier/' + currentSupplier.id + '/edit';
+    }
+
+    // Utility functions
+    function formatCurrency(amount) {
+        return '₹' + amount.toLocaleString('en-IN');
+    }
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-IN', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric' 
+        });
+    }
+
+    function capitalizeFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // Global functions for quick actions (called from HTML)
+    window.generateStatement = generateStatement;
+    window.downloadReports = downloadReports;
+    window.sendPaymentReminder = sendPaymentReminder;
+    window.editSupplier = editSupplier;
+    window.submitQuery = submitQuery;
+    window.clearForm = clearForm;
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initSupplierDetail();
+        
+        // Add click handlers for buttons that aren't in forms
+        const quickActionButtons = document.querySelectorAll('.action-btn');
+        quickActionButtons.forEach(button => {
+            if (button.textContent.includes('Generate Statement')) {
+                button.onclick = generateStatement;
+            } else if (button.textContent.includes('Download Reports')) {
+                button.onclick = downloadReports;
+            } else if (button.textContent.includes('Send Reminder')) {
+                button.onclick = sendPaymentReminder;
+            } else if (button.textContent.includes('Edit Supplier')) {
+                button.onclick = editSupplier;
+            }
+        });
+    });
+
+    // For navigation from suppliers list page
+    window.showSupplierDetail = function(supplierId) {
+        window.location.href = `/supplier/${supplierId}`;
+    };
+</script>
+{% endblock %}
+

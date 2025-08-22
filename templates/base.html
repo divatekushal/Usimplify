@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}FinanceFlow – Owner Dashboard{% endblock %}</title>
+
+  <!-- Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Custom styles -->
+  <style>
+    :root{
+      --clr-primary:       #2563eb;  /* brand blue 600  */
+      --clr-primary-dark:  #1d4ed8;  /* brand blue 700  */
+      --clr-bg-sidebar:    #f9fafb;  /* light grey      */
+      --clr-bg-hover:      #eef2f7;  /* hover grey      */
+      --clr-bg-active:     var(--clr-primary);
+      --clr-text:          #374151;  /* slate 700       */
+      --clr-text-dark:     #111827;  /* slate 900       */
+    }
+
+    *{font-family:'Inter',sans-serif;}
+
+    /* ====== LAYOUT ====== */
+    .sidebar-fixed{position:fixed;top:0;left:0;height:100vh;z-index:40;background:var(--clr-bg-sidebar);backdrop-filter:saturate(180%) blur(4px);box-shadow:2px 0 6px rgba(0,0,0,.04);}
+    .header-fixed {position:fixed;top:0;left:0;right:0;height:72px;z-index:30;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.04);}
+    .main-content {margin-top:72px;overflow-y:auto;height:calc(100vh - 72px);}
+
+    .sidebar-expanded {width:260px;}
+    .sidebar-collapsed{width:78px;}
+    .content-expanded {margin-left:260px;}
+    .content-collapsed{margin-left:78px;}
+
+    /* ====== NAVBAR ====== */
+    .navbar-container{max-width:1360px;margin:0 auto;height:100%;display:flex;align-items:center;justify-content:space-between;padding:0 32px;}
+    .navbar-logo{font-weight:700;font-size:1.25rem;color:var(--clr-text-dark);text-decoration:none;}
+    .navbar-links{display:flex;gap:28px;}
+    .navbar-links a{font-size:1rem;color:var(--clr-text);text-decoration:none;transition:color .2s ease;}
+    .navbar-links a:hover{color:var(--clr-text-dark);}
+    .navbar-links .cta{padding:10px 22px;background:var(--clr-primary);color:#fff;border-radius:8px;transition:background .2s;}
+    .navbar-links .cta:hover{background:var(--clr-primary-dark);}
+
+    /* ====== SIDEBAR MENU ====== */
+    .sidebar-item{
+      display:flex;align-items:center;gap:14px;
+      padding:16px 20px;font-size:1rem;font-weight:500;border-radius:8px;
+      color:var(--clr-text);transition:background .2s,color .2s;
+    }
+    .sidebar-item i{width:22px;text-align:center;}
+    .sidebar-item:hover{background:var(--clr-bg-hover);color:var(--clr-primary-dark);}
+    .sidebar-item.active{background:var(--clr-bg-active);color:#fff;}
+
+    /* ====== CARDS / TABLES (unchanged) ====== */
+    .card-compact{background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,.05);transition:box-shadow .2s;}
+    .card-compact:hover{box-shadow:0 4px 8px rgba(0,0,0,.08);}
+    .metric-value{font-size:2rem;font-weight:700;line-height:1.1;}
+
+    .table-compact{font-size:.9rem;}
+    .table-compact thead th{background:#f1f5f9;border-bottom:2px solid #e2e8f0;color:var(--clr-text);font-weight:600;padding:12px;text-transform:uppercase;letter-spacing:.03em;}
+    .table-compact tbody td{padding:10px 12px;border-bottom:1px solid #f3f4f6;color:var(--clr-text);}
+    .table-compact tbody tr:hover{background:#f8fafc;}
+
+    .status-badge{padding:4px 10px;border-radius:5px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+    .status-processed{background:#dcfce7;color:#166534;}
+    .status-verified {background:#dbeafe;color:#1d4ed8;}
+    .status-pending  {background:#fef3c7;color:#92400e;}
+    .status-exception{background:#fee2e2;color:#dc2626;}
+    .status-posted   {background:#e0e7ff;color:#3730a3;}
+
+    .chart-container{position:relative;height:220px;width:100%;}
+    .card-image{width:44px;height:44px;object-fit:contain;border-radius:10px;}
+
+    /* ====== MOBILE ====== */
+    @media (max-width:768px){
+      .sidebar-mobile-hidden{transform:translateX(-100%);}
+      .content-mobile{margin-left:0!important;}
+    }
+
+    {% block extra_css %}{% endblock %}
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+  <!-- Mobile overlay -->
+  <div id="mobile-overlay" class="fixed inset-0 bg-black/40 z-50 hidden md:hidden"></div>
+
+  <!-- ====== SIDEBAR ====== -->
+  <aside id="sidebar" class="sidebar-fixed sidebar-expanded transition-all duration-300">
+    <!-- Logo -->
+    <div class="p-5 border-b border-gray-200 relative">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-[var(--clr-primary)] rounded-lg flex items-center justify-center">
+          <i class="fas fa-chart-line text-white text-sm"></i>
+        </div>
+        <div class="sidebar-text">
+          <h1 class="text-base font-semibold text-[var(--clr-text-dark)]">FinanceFlow</h1>
+          <p class="text-xs text-gray-500">Owner Dashboard</p>
+        </div>
+      </div>
+
+      <!-- Collapse button -->
+      <button id="sidebar-toggle" class="absolute top-5 -right-4 w-7 h-7 rounded-full bg-white border border-gray-200 shadow hover:shadow-md transition hidden md:block">
+        <i class="fas fa-chevron-left text-gray-500 text-xs"></i>
+      </button>
+    </div>
+
+    <!-- Menu -->
+    <nav class="py-5 overflow-y-auto">
+      <ul class="space-y-1 px-2">
+        <li><a href="/dashboard"  class="sidebar-item {% if request.endpoint=='dashboard'  %}active{% endif %}"><i class="fas fa-gauge"></i>        <span class="sidebar-text">Dashboard</span></a></li>
+        <li><a href="/bank"       class="sidebar-item {% if request.endpoint=='bank'       %}active{% endif %}"><i class="fas fa-university"></i>   <span class="sidebar-text">Bank</span></a></li>
+        <li><a href="/books"      class="sidebar-item {% if request.endpoint=='books'      %}active{% endif %}"><i class="fas fa-book"></i>         <span class="sidebar-text">Books</span></a></li>
+        <li><a href="/customers"  class="sidebar-item {% if request.endpoint=='customers'  %}active{% endif %}"><i class="fas fa-users"></i>        <span class="sidebar-text">Customers</span></a></li>
+        <li><a href="/inventory"  class="sidebar-item {% if request.endpoint=='inventory'  %}active{% endif %}"><i class="fas fa-boxes-stacked"></i><span class="sidebar-text">Inventory</span></a></li>
+        <li><a href="/suppliers"  class="sidebar-item {% if request.endpoint=='suppliers'  %}active{% endif %}"><i class="fas fa-truck"></i>        <span class="sidebar-text">Suppliers</span></a></li>
+        <li><a href="/accountant" class="sidebar-item {% if request.endpoint=='accountant' %}active{% endif %}"><i class="fas fa-calculator"></i>    <span class="sidebar-text">Accountant</span></a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ====== NAVBAR ====== -->
+  <header id="top-header" class="header-fixed content-expanded transition-all">
+    <div class="navbar-container">
+      <!-- Mobile toggle & titles -->
+      <div class="flex items-center gap-4">
+        <button id="mobile-menu-toggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+          <i class="fas fa-bars text-gray-600"></i>
+        </button>
+        <div>
+          <h1 class="text-2xl font-semibold text-[var(--clr-text-dark)]">{% block page_title %}Financial Dashboard{% endblock %}</h1>
+          <p class="text-xs text-gray-500">{% block page_subtitle %}Real-time financial operations overview{% endblock %}</p>
+        </div>
+      </div>
+
+      <!-- Links & actions -->
+      <div class="flex items-center gap-6">
+       
+
+        <div class="flex items-center gap-3">
+          <button class="p-2 rounded-lg hover:bg-gray-100 relative">
+            <i class="fas fa-bell text-gray-500 text-sm"></i>
+            <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+          <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+            <i class="fas fa-user text-gray-600 text-xs"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====== MAIN ====== -->
+  <main id="main-content" class="main-content content-expanded">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ====== SCRIPTS ====== -->
+  <script>
+    /* ---------- ELEMENTS ---------- */
+    const sidebar      = document.getElementById('sidebar');
+    const sidebarTgl   = document.getElementById('sidebar-toggle');
+    const mobileTgl    = document.getElementById('mobile-menu-toggle');
+    const mobileOv     = document.getElementById('mobile-overlay');
+    const sidebarTxt   = document.querySelectorAll('.sidebar-text');
+    const topHeader    = document.getElementById('top-header');
+    const mainContent  = document.getElementById('main-content');
+
+    let collapsed = false;
+
+    /* ---------- DESKTOP COLLAPSE ---------- */
+    function toggleSidebar(){
+      collapsed = !collapsed;
+      sidebar.classList.toggle('sidebar-expanded', !collapsed);
+      sidebar.classList.toggle('sidebar-collapsed', collapsed);
+      topHeader.classList.toggle('content-expanded', !collapsed);
+      topHeader.classList.toggle('content-collapsed', collapsed);
+      mainContent.classList.toggle('content-expanded', !collapsed);
+      mainContent.classList.toggle('content-collapsed', collapsed);
+      sidebarTxt.forEach(el => el.style.display = collapsed ? 'none':'inline');
+      sidebarTgl.innerHTML = collapsed
+        ? '<i class="fas fa-chevron-right text-gray-500 text-xs"></i>'
+        : '<i class="fas fa-chevron-left  text-gray-500 text-xs"></i>';
+    }
+
+    /* ---------- MOBILE DRAWER ---------- */
+    function toggleMobileSidebar(){
+      const hidden = sidebar.classList.toggle('sidebar-mobile-hidden');
+      mobileOv.classList.toggle('hidden', hidden);
+    }
+
+    sidebarTgl   && sidebarTgl.addEventListener('click', toggleSidebar);
+    mobileTgl    && mobileTgl.addEventListener('click', toggleMobileSidebar);
+    mobileOv     && mobileOv.addEventListener('click', toggleMobileSidebar);
+
+    /* ---------- INITIAL RESPONSIVE STATE ---------- */
+    function handleResize(){
+      if(window.innerWidth >= 768){
+        sidebar.classList.remove('sidebar-mobile-hidden');
+        mobileOv.classList.add('hidden');
+        topHeader .classList.remove('content-mobile');
+        mainContent.classList.remove('content-mobile');
+      }else{
+        sidebar.classList.add('sidebar-mobile-hidden');
+        topHeader .classList.add('content-mobile');
+        mainContent.classList.add('content-mobile');
+      }
+    }
+    window.addEventListener('resize', handleResize);
+    handleResize();
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

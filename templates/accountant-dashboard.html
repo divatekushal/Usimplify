@@ -1,0 +1,1109 @@
+{% extends "base.html" %}
+
+{% block title %}Accountant Dashboard - FinanceFlow{% endblock %}
+{% block page_title %}Accountant Dashboard{% endblock %}
+{% block page_subtitle %}Document Processing & Financial Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f8fafc;
+        color: #334155;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .welcome-header {
+        margin-bottom: 3rem;
+    }
+
+    .welcome-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .welcome-header p {
+        color: #64748b;
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-icon {
+        font-size: 1.125rem;
+    }
+
+    /* Enhanced Card Design with Icons */
+    .stats-section {
+        margin-bottom: 3rem;
+    }
+
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card {
+        flex: 1 1 calc(25% - 1rem);
+        min-width: 220px;
+        max-width: 240px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 2rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transform: translateY(-4px);
+    }
+
+    .stat-card:hover::before {
+        height: 6px;
+    }
+
+    .card-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #64748b;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover .card-icon {
+        transform: scale(1.1);
+    }
+
+    /* Status-specific colors */
+    .stat-card.processing::before {
+        background: #f59e0b;
+    }
+    .stat-card.processing .card-icon {
+        color: #f59e0b;
+    }
+
+    .stat-card.ready::before {
+        background: #3b82f6;
+    }
+    .stat-card.ready .card-icon {
+        color: #3b82f6;
+    }
+
+    .stat-card.posted::before {
+        background: #10b981;
+    }
+    .stat-card.posted .card-icon {
+        color: #10b981;
+    }
+
+    .stat-card.exception::before {
+        background: #ef4444;
+    }
+    .stat-card.exception .card-icon {
+        color: #ef4444;
+    }
+
+    .stat-card.verified::before {
+        background: #8b5cf6;
+    }
+    .stat-card.verified .card-icon {
+        color: #8b5cf6;
+    }
+
+    .stat-value {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.5rem 0;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #64748b;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    /* Posting Summary Cards */
+    .posting-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 3rem;
+    }
+
+    .posting-card {
+        flex: 1 1 calc(25% - 1rem);
+        min-width: 240px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .posting-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .posting-card-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .posting-info h3 {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .posting-amount {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .posting-trend {
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: #64748b;
+    }
+
+    .trend-up { color: #059669; }
+    .trend-down { color: #dc2626; }
+    .trend-neutral { color: #d97706; }
+
+    .posting-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        background: linear-gradient(135deg, #64748b, #475569);
+    }
+
+    .posting-icon.sales {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .posting-icon.purchases {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .posting-icon.expenses {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .posting-icon.others {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    }
+
+    /* Document Management Section */
+    .documents-section {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+
+    .documents-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .header-info h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .header-info p {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+    }
+
+    .btn-success {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+        transform: translateY(-1px);
+    }
+
+    .filters-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .filters-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        transition: all 0.2s ease;
+    }
+
+    .filter-btn.active {
+        background: #1e293b;
+        color: white;
+        border-color: #1e293b;
+    }
+
+    .filter-btn:hover:not(.active) {
+        background: #f3f4f6;
+        border-color: #9ca3af;
+    }
+
+    .search-container {
+        position: relative;
+    }
+
+    .search-input {
+        width: 280px;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: border-color 0.2s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+
+    /* Table and pagination styles remain the same */
+    .documents-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .documents-table th {
+        background: #f8fafc;
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .documents-table th:hover {
+        background: #f1f5f9;
+    }
+
+    .documents-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.875rem;
+        color: #374151;
+    }
+
+    .documents-table tr:hover {
+        background: #f9fafb;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .status-processing { background: #fef3c7; color: #92400e; }
+    .status-ready { background: #dbeafe; color: #1e40af; }
+    .status-posted { background: #d1fae5; color: #065f46; }
+    .status-exception { background: #fee2e2; color: #991b1b; }
+    .status-verified { background: #e0e7ff; color: #3730a3; }
+    .status-unpaid { background: #fed7aa; color: #9a3412; }
+    .status-partial { background: #e0e7ff; color: #4338ca; }
+    .status-paid { background: #d1fae5; color: #065f46; }
+
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        padding: 0.5rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-view {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .btn-view:hover {
+        background: #c7d2fe;
+        transform: scale(1.05);
+    }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .btn-delete:hover {
+        background: #fecaca;
+        transform: scale(1.05);
+    }
+
+    .pagination-container {
+        padding: 1rem 2rem;
+        border-top: 1px solid #e5e7eb;
+        background: #f8fafc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .pagination-info {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-btn {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .page-btn:hover:not(:disabled) {
+        background: #f3f4f6;
+        transform: translateY(-1px);
+    }
+
+    .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .page-btn.active {
+        background: #1e293b;
+        color: white;
+        border-color: #1e293b;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #64748b;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .stat-card, .posting-card {
+            flex: 1 1 calc(50% - 0.5rem);
+            min-width: 200px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 1rem;
+        }
+
+        .stat-card, .posting-card {
+            flex: 1 1 100%;
+            min-width: auto;
+        }
+
+        .header-content {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .filters-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-input {
+            width: 100%;
+        }
+
+        .pagination-container {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Welcome Header -->
+    <div class="welcome-header">
+        <h1>Welcome back, <span id="accountant-name">Amit Kumar</span></h1>
+        <p>Here's what's happening with your documents today</p>
+    </div>
+
+    <!-- Invoice Processing Section -->
+    <div class="stats-section">
+        <h2 class="section-title">
+            <i class="fas fa-file-invoice section-icon" style="color: #475569;"></i>
+            Invoice Processing
+        </h2>
+        <div class="card-container">
+            <div class="stat-card processing" title="Invoices - Submitted for Processing">
+                <div class="card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value" id="invoices-processing">24</div>
+                <div class="stat-label">For Processing</div>
+            </div>
+            
+            <div class="stat-card ready" title="Invoices - Ready for Posting">
+                <div class="card-icon">
+                    <i class="fas fa-paper-plane"></i>
+                </div>
+                <div class="stat-value" id="invoices-ready">18</div>
+                <div class="stat-label">Ready to Post</div>
+            </div>
+            
+            <div class="stat-card posted" title="Invoices - Posted">
+                <div class="card-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value" id="invoices-posted">156</div>
+                <div class="stat-label">Posted</div>
+            </div>
+            
+            <div class="stat-card exception" title="Invoices - Exceptions">
+                <div class="card-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-value" id="invoices-exception">7</div>
+                <div class="stat-label">Exceptions</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bank Statements Section -->
+    <div class="stats-section">
+        <h2 class="section-title">
+            <i class="fas fa-university section-icon" style="color: #475569;"></i>
+            Bank Statement Processing
+        </h2>
+        <div class="card-container">
+            <div class="stat-card processing" title="Bank Statements - Submitted for Processing">
+                <div class="card-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <div class="stat-value" id="bank-processing">12</div>
+                <div class="stat-label">For Processing</div>
+            </div>
+            
+            <div class="stat-card verified" title="Bank Statements - Verified">
+                <div class="card-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="stat-value" id="bank-verified">31</div>
+                <div class="stat-label">Verified</div>
+            </div>
+            
+            <div class="stat-card posted" title="Bank Statements - Posted">
+                <div class="card-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="stat-value" id="bank-posted">89</div>
+                <div class="stat-label">Posted</div>
+            </div>
+            
+            <div class="stat-card exception" title="Bank Statements - Exceptions">
+                <div class="card-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-value" id="bank-exception">5</div>
+                <div class="stat-label">Exceptions</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posting Summary -->
+    <div class="stats-section">
+        <h2 class="section-title">
+            <i class="fas fa-chart-bar section-icon" style="color: #475569;"></i>
+            Posting Summary
+        </h2>
+        <div class="posting-summary">
+            <div class="posting-card">
+                <div class="posting-card-content">
+                    <div class="posting-info">
+                        <h3>Sales</h3>
+                        <div class="posting-amount">₹12.5L</div>
+                        <div class="posting-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            8.2% from last month
+                        </div>
+                    </div>
+                    <div class="posting-icon sales">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="posting-card">
+                <div class="posting-card-content">
+                    <div class="posting-info">
+                        <h3>Purchases</h3>
+                        <div class="posting-amount">₹8.7L</div>
+                        <div class="posting-trend trend-down">
+                            <i class="fas fa-arrow-down"></i>
+                            3.1% from last month
+                        </div>
+                    </div>
+                    <div class="posting-icon purchases">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="posting-card">
+                <div class="posting-card-content">
+                    <div class="posting-info">
+                        <h3>Expenses</h3>
+                        <div class="posting-amount">₹3.2L</div>
+                        <div class="posting-trend trend-neutral">
+                            <i class="fas fa-minus"></i>
+                            0.5% from last month
+                        </div>
+                    </div>
+                    <div class="posting-icon expenses">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="posting-card">
+                <div class="posting-card-content">
+                    <div class="posting-info">
+                        <h3>Others</h3>
+                        <div class="posting-amount">₹1.8L</div>
+                        <div class="posting-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            12.4% from last month
+                        </div>
+                    </div>
+                    <div class="posting-icon others">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Documents Management Section -->
+    <div class="documents-section">
+        <div class="documents-header">
+            <div class="header-content">
+                <div class="header-info">
+                    <h2>Document Management</h2>
+                    <p>Manage all uploaded documents and their processing status</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success">
+                        <i class="fas fa-plus"></i>
+                        New Invoice
+                    </button>
+                    <button class="btn btn-primary" onclick="exportDocuments()">
+                        <i class="fas fa-download"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="filters-container">
+                <div class="filters-group">
+                    <button class="filter-btn active" data-filter="all" onclick="filterDocuments('all')">All</button>
+                    <button class="filter-btn" data-filter="ready" onclick="filterDocuments('ready')">Ready for Posting</button>
+                    <button class="filter-btn" data-filter="unpaid" onclick="filterDocuments('unpaid')">Unpaid</button>
+                    <button class="filter-btn" data-filter="partial" onclick="filterDocuments('partial')">Partially Paid</button>
+                    <button class="filter-btn" data-filter="paid" onclick="filterDocuments('paid')">Fully Paid</button>
+                    <button class="filter-btn" data-filter="exception" onclick="filterDocuments('exception')">Exceptions</button>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" 
+                           id="search-input" 
+                           class="search-input"
+                           placeholder="Search documents..." 
+                           onkeyup="searchDocuments()">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="documents-table">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable('sl')">SL <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable('uploadTime')">Upload Time <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable('docId')">Doc ID <i class="fas fa-sort"></i></th>
+                        <th>Filename</th>
+                        <th onclick="sortTable('status')">Status <i class="fas fa-sort"></i></th>
+                        <th>Type</th>
+                        <th>Party Name</th>
+                        <th>Posted By</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="documents-table-body">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Showing <span id="showing-start">1</span> to <span id="showing-end">10</span> of <span id="total-documents">50</span> documents
+            </div>
+            <div class="pagination-controls">
+                <button class="page-btn" id="prev-page" onclick="changePage(-1)" disabled>Previous</button>
+                <div id="page-numbers"></div>
+                <button class="page-btn" id="next-page" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Sample data
+    const documentsData = [
+        {
+            id: 1,
+            uploadTime: '2025-08-22 09:15 AM',
+            docId: 'INV-2025-001',
+            filename: 'invoice_acme_corp_aug22.pdf',
+            status: 'ready',
+            type: 'Invoice',
+            partyName: 'Acme Corporation',
+            postedBy: 'Amit Kumar'
+        },
+        {
+            id: 2,
+            uploadTime: '2025-08-22 08:30 AM',
+            docId: 'BS-2025-034',
+            filename: 'bank_statement_hdfc_aug.pdf',
+            status: 'processing',
+            type: 'Bank Statement',
+            partyName: 'HDFC Bank',
+            postedBy: 'Priya Sharma'
+        },
+        {
+            id: 3,
+            uploadTime: '2025-08-21 04:45 PM',
+            docId: 'EXP-2025-089',
+            filename: 'office_rent_receipt.pdf',
+            status: 'posted',
+            type: 'Expense',
+            partyName: 'Property Solutions',
+            postedBy: 'Amit Kumar'
+        },
+        {
+            id: 4,
+            uploadTime: '2025-08-21 03:20 PM',
+            docId: 'INV-2025-002',
+            filename: 'sales_invoice_beta_ltd.pdf',
+            status: 'unpaid',
+            type: 'Sales Invoice',
+            partyName: 'Beta Electronics Ltd',
+            postedBy: 'Rajesh Patel'
+        },
+        {
+            id: 5,
+            uploadTime: '2025-08-21 02:10 PM',
+            docId: 'PUR-2025-156',
+            filename: 'purchase_order_gamma.pdf',
+            status: 'partial',
+            type: 'Purchase',
+            partyName: 'Gamma Chemicals',
+            postedBy: 'Amit Kumar'
+        }
+    ];
+
+    let filteredDocuments = [...documentsData];
+    let currentFilter = 'all';
+    let currentPage = 1;
+    let documentsPerPage = 8;
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        renderDocumentsTable();
+        updatePagination();
+    });
+
+    function filterDocuments(filter) {
+        currentFilter = filter;
+        currentPage = 1;
+
+        // Update filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.filter === filter) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Filter documents
+        if (filter === 'all') {
+            filteredDocuments = [...documentsData];
+        } else {
+            filteredDocuments = documentsData.filter(doc => doc.status === filter);
+        }
+
+        renderDocumentsTable();
+        updatePagination();
+    }
+
+    function searchDocuments() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        
+        if (searchTerm === '') {
+            filterDocuments(currentFilter);
+            return;
+        }
+
+        filteredDocuments = documentsData.filter(doc => {
+            return doc.filename.toLowerCase().includes(searchTerm) ||
+                   doc.docId.toLowerCase().includes(searchTerm) ||
+                   doc.partyName.toLowerCase().includes(searchTerm) ||
+                   doc.type.toLowerCase().includes(searchTerm);
+        });
+
+        currentPage = 1;
+        renderDocumentsTable();
+        updatePagination();
+    }
+
+    function renderDocumentsTable() {
+        const tbody = document.getElementById('documents-table-body');
+        const start = (currentPage - 1) * documentsPerPage;
+        const end = start + documentsPerPage;
+        const pageData = filteredDocuments.slice(start, end);
+
+        tbody.innerHTML = '';
+
+        if (pageData.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <div>No documents found</div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        pageData.forEach((doc, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="font-weight: 600;">${start + index + 1}</td>
+                <td style="color: #64748b; font-size: 0.875rem;">${doc.uploadTime}</td>
+                <td style="font-family: 'Monaco', monospace; font-size: 0.875rem;">${doc.docId}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-file-pdf" style="color: #ef4444;"></i>
+                        <span style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${doc.filename}">${doc.filename}</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="status-badge status-${doc.status}">
+                        ${getStatusDisplay(doc.status)}
+                    </span>
+                </td>
+                <td>
+                    <span class="type-badge">${doc.type}</span>
+                </td>
+                <td style="font-weight: 500;">${doc.partyName}</td>
+                <td style="color: #64748b;">${doc.postedBy}</td>
+                <td style="text-align: center;">
+                    <div class="action-buttons">
+                        <button class="action-btn btn-view" onclick="viewDocument(${doc.id})" title="View Document">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn btn-delete" onclick="deleteDocument(${doc.id})" title="Delete Document">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function getStatusDisplay(status) {
+        const statusMap = {
+            'processing': 'Processing',
+            'ready': 'Ready',
+            'posted': 'Posted',
+            'exception': 'Exception',
+            'verified': 'Verified',
+            'unpaid': 'Unpaid',
+            'partial': 'Partial',
+            'paid': 'Paid'
+        };
+        return statusMap[status] || status;
+    }
+
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredDocuments.length / documentsPerPage);
+        const start = (currentPage - 1) * documentsPerPage + 1;
+        const end = Math.min(currentPage * documentsPerPage, filteredDocuments.length);
+
+        document.getElementById('showing-start').textContent = filteredDocuments.length > 0 ? start : 0;
+        document.getElementById('showing-end').textContent = end;
+        document.getElementById('total-documents').textContent = filteredDocuments.length;
+
+        // Update prev/next buttons
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages || totalPages === 0;
+
+        // Generate page numbers
+        const pageNumbers = document.getElementById('page-numbers');
+        pageNumbers.innerHTML = '';
+
+        for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.textContent = i;
+            pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+            pageBtn.onclick = () => goToPage(i);
+            pageNumbers.appendChild(pageBtn);
+        }
+    }
+
+    function changePage(direction) {
+        const totalPages = Math.ceil(filteredDocuments.length / documentsPerPage);
+        const newPage = currentPage + direction;
+        
+        if (newPage >= 1 && newPage <= totalPages) {
+            currentPage = newPage;
+            renderDocumentsTable();
+            updatePagination();
+        }
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        renderDocumentsTable();
+        updatePagination();
+    }
+
+    function viewDocument(id) {
+        const doc = documentsData.find(d => d.id === id);
+        alert(`Viewing document: ${doc.filename}\nDoc ID: ${doc.docId}\nStatus: ${doc.status}`);
+    }
+
+    function deleteDocument(id) {
+        if (confirm('Are you sure you want to delete this document?')) {
+            const index = documentsData.findIndex(d => d.id === id);
+            if (index > -1) {
+                documentsData.splice(index, 1);
+            }
+            
+            const filteredIndex = filteredDocuments.findIndex(d => d.id === id);
+            if (filteredIndex > -1) {
+                filteredDocuments.splice(filteredIndex, 1);
+            }
+            
+            renderDocumentsTable();
+            updatePagination();
+            alert('Document deleted successfully');
+        }
+    }
+
+    function exportDocuments() {
+        const headers = ['SL', 'Upload Time', 'Doc ID', 'Filename', 'Status', 'Type', 'Party Name', 'Posted By'];
+        const csvContent = [
+            headers.join(','),
+            ...filteredDocuments.map((doc, index) => [
+                index + 1,
+                `"${doc.uploadTime}"`,
+                doc.docId,
+                `"${doc.filename}"`,
+                doc.status,
+                `"${doc.type}"`,
+                `"${doc.partyName}"`,
+                `"${doc.postedBy}"`
+            ].join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `documents_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+</script>
+{% endblock %}

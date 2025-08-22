@@ -1,0 +1,1997 @@
+{% extends "base.html" %}
+
+{% block title %}{{ customer.name }} - Customer Details - FinanceFlow{% endblock %}
+{% block page_title %}{{ customer.name }}{% endblock %}
+{% block page_subtitle %}Customer Details & Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f8fafc;
+        color: #374151;
+    }
+
+    .detail-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .detail-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .info-value.amount {
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 1.125rem;
+    }
+
+    .info-value.positive { color: #059669; }
+    .info-value.negative { color: #dc2626; }
+    .info-value.zero { color: #6b7280; }
+
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .status-active {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-inactive {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .action-button {
+        background-color: #2563eb;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .action-button:hover {
+        background-color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    .action-button.secondary {
+        background-color: #6b7280;
+    }
+
+    .action-button.secondary:hover {
+        background-color: #4b5563;
+    }
+
+    .template-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+    }
+
+    .template-card {
+        background-color: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .template-card:hover {
+        background-color: #f1f5f9;
+        border-color: #2563eb;
+        transform: translateY(-1px);
+    }
+
+    .template-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .template-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+
+    .kyc-document {
+        background-color: #ffffff;
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .kyc-document:hover {
+        border-color: #2563eb;
+        background-color: #f8fafc;
+    }
+
+    .kyc-document.uploaded {
+        border-style: solid;
+        border-color: #10b981;
+        background-color: #ecfdf5;
+    }
+
+    .kyc-icon {
+        font-size: 2rem;
+        color: #9ca3af;
+        margin-bottom: 1rem;
+    }
+
+    .kyc-document.uploaded .kyc-icon {
+        color: #10b981;
+    }
+
+    .document-title {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .document-status {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .kyc-document.uploaded .document-status {
+        color: #059669;
+    }
+
+    .modal {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+
+    .modal.show {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .modal-content {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 4xl;
+        max-height: 90vh;
+        overflow: hidden;
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+    }
+
+    .modal.show .modal-content {
+        transform: scale(1);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        background-color: #f8fafc;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+        background-color: #e5e7eb;
+        color: #374151;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        max-height: calc(90vh - 120px);
+    }
+
+    .transaction-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .transaction-table th {
+        background-color: #f8fafc;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        border-bottom: 2px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+    }
+
+    .transaction-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f3f4f6;
+        color: #374151;
+        font-size: 0.875rem;
+    }
+
+    .transaction-table tr:hover td {
+        background-color: #f9fafb;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .breadcrumb a {
+        color: #2563eb;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .breadcrumb a:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+
+    .breadcrumb-separator {
+        color: #9ca3af;
+    }
+
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .template-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .modal-content {
+            width: 95%;
+            margin: 1rem;
+        }
+        
+        .quick-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .template-editor {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.email-header-info .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-input {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
+}
+
+.info-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.email-template {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 2rem;
+    min-height: 400px;
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.email-template[contenteditable="true"] {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.email-template h1, .email-template h2, .email-template h3 {
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+.email-template .company-header {
+    border-bottom: 2px solid #2563eb;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.email-template .company-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2563eb;
+    margin-bottom: 0.5rem;
+}
+
+.email-template .company-tagline {
+    color: #6b7280;
+    font-style: italic;
+}
+
+.email-template .customer-info {
+    background-color: #f8fafc;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    border-left: 4px solid #2563eb;
+}
+
+.email-template .highlight {
+    background-color: #fef3c7;
+    padding: 0.125rem 0.25rem;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.email-template .amount {
+    font-weight: bold;
+    color: #dc2626;
+    font-size: 1.125rem;
+}
+
+.email-template .footer {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1rem;
+    margin-top: 2rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.email-preview {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.template-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .template-actions {
+        flex-direction: column;
+    }
+    
+    .template-footer .flex {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="/customers">Customers</a>
+        <span class="breadcrumb-separator">›</span>
+        <span class="font-medium text-gray-900">{{ customer.name }}</span>
+    </nav>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+        <div class="stat-card">
+            <div class="stat-value">₹{{ "{:,.0f}".format(customer.total_receivable) }}</div>
+            <div class="stat-label">Total Receivable</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">₹{{ "{:,.0f}".format(customer.receipts) }}</div>
+            <div class="stat-label">Total Receipts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">₹{{ "{:,.0f}".format(customer.balance) }}</div>
+            <div class="stat-label">Outstanding Balance</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ customer.days_outstanding }}</div>
+            <div class="stat-label">Days Outstanding</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Customer Information -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-user text-blue-600"></i>
+                        Customer Information
+                    </h2>
+                    <div class="status-indicator status-{{ customer.status }}">
+                        <div class="w-2 h-2 bg-current rounded-full"></div>
+                        {{ customer.status }}
+                    </div>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Customer Name</span>
+                        <span class="info-value">{{ customer.name }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Customer Code</span>
+                        <span class="info-value">{{ customer.code }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Customer Since</span>
+                        <span class="info-value">{{ customer.customer_since }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Ledger Name</span>
+                        <span class="info-value">{{ customer.ledger_name }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Details -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-address-book text-green-600"></i>
+                        Contact Details
+                    </h2>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Primary Contact</span>
+                        <span class="info-value">{{ customer.primary_contact }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Phone Number</span>
+                        <span class="info-value">{{ customer.phone }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email Address</span>
+                        <span class="info-value">{{ customer.email }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Address</span>
+                        <span class="info-value">{{ customer.address }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GST Details -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-file-alt text-purple-600"></i>
+                        GST Details
+                    </h2>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">GST Number</span>
+                        <span class="info-value">{{ customer.gst_number }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">GST Type</span>
+                        <span class="info-value">{{ customer.gst_type }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">State Code</span>
+                        <span class="info-value">{{ customer.state_code }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Registration Date</span>
+                        <span class="info-value">{{ customer.gst_reg_date }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Templates -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-envelope text-orange-600"></i>
+                        Email Templates
+                    </h2>
+                </div>
+                
+                <div class="template-grid">
+                    <div class="template-card" onclick="sendTemplate('payment_due')">
+                        <div class="template-title">
+                            <i class="fas fa-exclamation-circle text-red-500"></i>
+                            Payment Due Reminder
+                        </div>
+                        <div class="template-description">
+                            Send automated payment reminder for overdue invoices
+                        </div>
+                    </div>
+                    
+                    <div class="template-card" onclick="sendTemplate('cheque_bounce')">
+                        <div class="template-title">
+                            <i class="fas fa-ban text-red-500"></i>
+                            Cheque Return Notice
+                        </div>
+                        <div class="template-description">
+                            Notify customer about returned/bounced cheque
+                        </div>
+                    </div>
+                    
+                    <div class="template-card" onclick="sendTemplate('apology')">
+                        <div class="template-title">
+                            <i class="fas fa-heart text-pink-500"></i>
+                            Apology Letter
+                        </div>
+                        <div class="template-description">
+                            Send apology for any service disruption or error
+                        </div>
+                    </div>
+                    
+                    <div class="template-card" onclick="sendTemplate('msme_confirmation')">
+                        <div class="template-title">
+                            <i class="fas fa-certificate text-blue-500"></i>
+                            MSME Status Confirmation
+                        </div>
+                        <div class="template-description">
+                            Confirm MSME registration status and benefits
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KYC Documents -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-shield-alt text-indigo-600"></i>
+                        KYC Documents
+                    </h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="kyc-document {{ 'uploaded' if customer.pan_uploaded else '' }}" onclick="handleDocumentUpload('pan')">
+                        <div class="kyc-icon">
+                            <i class="fas {{ 'fa-check-circle' if customer.pan_uploaded else 'fa-id-card' }}"></i>
+                        </div>
+                        <div class="document-title">PAN Card</div>
+                        <div class="document-status">
+                            {% if customer.pan_uploaded %}
+                                Uploaded & Verified
+                            {% else %}
+                                Click to upload PAN card
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                                        <div class="kyc-document {{ 'uploaded' if customer.aadhar_uploaded else '' }}" onclick="handleDocumentUpload('aadhar')">
+                        <div class="kyc-icon">
+                            <i class="fas {{ 'fa-check-circle' if customer.aadhar_uploaded else 'fa-address-card' }}"></i>
+                        </div>
+                        <div class="document-title">Aadhar Card</div>
+                        <div class="document-status">
+                            {% if customer.aadhar_uploaded %}
+                                Uploaded & Verified
+                            {% else %}
+                                Click to upload Aadhar card
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- Quick Actions -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-bolt text-yellow-500"></i>
+                        Quick Actions
+                    </h2>
+                </div>
+                
+                <div class="space-y-3">
+                    <button class="action-button w-full" onclick="openTransactionModal()">
+                        <i class="fas fa-history"></i>
+                        View Transactions
+                    </button>
+                    
+                    <button class="action-button secondary w-full" onclick="generateStatement()">
+                        <i class="fas fa-file-pdf"></i>
+                        Generate Statement
+                    </button>
+                    
+                    <button class="action-button secondary w-full" onclick="sendPaymentReminder()">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Payment Reminder
+                    </button>
+                    
+                    <button class="action-button secondary w-full" onclick="editCustomer()">
+                        <i class="fas fa-edit"></i>
+                        Edit Customer
+                    </button>
+                </div>
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-calculator text-green-600"></i>
+                        Financial Summary
+                    </h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="info-item">
+                        <span class="info-label">Credit Limit</span>
+                        <span class="info-value amount">₹{{ "{:,.0f}".format(customer.credit_limit) }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Payment Terms</span>
+                        <span class="info-value">{{ customer.payment_terms }} days</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Payment</span>
+                        <span class="info-value">{{ customer.last_payment_date }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Payment Amount</span>
+                        <span class="info-value amount positive">₹{{ "{:,.0f}".format(customer.last_payment_amount) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-clock text-blue-500"></i>
+                        Recent Activity
+                    </h2>
+                </div>
+                
+                <div class="space-y-3">
+                    {% for activity in customer.recent_activities %}
+                    <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900">{{ activity.description }}</div>
+                            <div class="text-xs text-gray-500 mt-1">{{ activity.date }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Modal -->
+<div class="modal" id="transaction-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Transaction History - {{ customer.name }}</h3>
+            <button class="modal-close" onclick="closeTransactionModal()">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <!-- Filter Controls -->
+            <div class="flex flex-wrap gap-4 mb-6">
+                <select id="transaction-filter" class="filter-select" onchange="filterTransactions()">
+                    <option value="all">All Transactions</option>
+                    <option value="invoice">Invoices</option>
+                    <option value="payment">Payments</option>
+                    <option value="credit_note">Credit Notes</option>
+                </select>
+                
+                <input type="date" id="date-from" class="filter-select" onchange="filterTransactions()">
+                <input type="date" id="date-to" class="filter-select" onchange="filterTransactions()">
+                
+                <button class="action-button" onclick="exportTransactions()">
+                    <i class="fas fa-download"></i>
+                    Export
+                </button>
+            </div>
+
+            <!-- Transactions Table -->
+            <div class="overflow-x-auto">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Invoice/Ref No</th>
+                            <th>Description</th>
+                            <th class="text-right">Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-tbody">
+                        <!-- Transactions will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for Modal -->
+            <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+                <div class="text-sm text-gray-600">
+                    Showing <span id="modal-showing">1-10</span> of <span id="modal-total">0</span> transactions
+                </div>
+                <div class="flex gap-2">
+                    <button class="page-btn" id="modal-prev" onclick="prevTransactionPage()" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="page-btn" id="modal-next" onclick="nextTransactionPage()">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Email Template Modal -->
+<div class="modal" id="template-modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="template-modal-title">Email Template</h3>
+            <button class="modal-close" onclick="closeTemplateModal()">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <!-- Template Editor -->
+            <div class="template-editor">
+                <!-- Email Header Info -->
+                <div class="email-header-info mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="info-item">
+                            <label class="info-label">To:</label>
+                            <input type="email" id="template-to" class="info-input" value="{{ customer.email }}">
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label">Subject:</label>
+                            <input type="text" id="template-subject" class="info-input" value="">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template Content -->
+                <div class="template-content-wrapper">
+                    <div class="template-actions mb-4">
+                        <button class="action-button" id="edit-btn" onclick="toggleEdit()">
+                            <i class="fas fa-edit"></i>
+                            Edit Template
+                        </button>
+                        <button class="action-button" id="save-btn" onclick="saveTemplate()" style="display: none;">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                        <button class="action-button secondary" onclick="resetTemplate()">
+                            <i class="fas fa-undo"></i>
+                            Reset
+                        </button>
+                    </div>
+
+                    <!-- Email Preview/Editor -->
+                    <div class="email-template" id="email-content">
+                        <!-- Template content will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="template-footer mt-6 pt-4 border-t border-gray-200">
+                    <div class="flex justify-end space-x-3">
+                        <button class="action-button secondary" onclick="closeTemplateModal()">
+                            Cancel
+                        </button>
+                        <button class="action-button" onclick="previewTemplate()">
+                            <i class="fas fa-eye"></i>
+                            Preview
+                        </button>
+                        <button class="action-button" onclick="sendTemplate()" style="background-color: #059669;">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal" id="preview-modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Email Preview</h3>
+            <button class="modal-close" onclick="closePreviewModal()">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="preview-content" class="email-preview">
+                <!-- Preview content will be loaded here -->
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button class="action-button secondary" onclick="closePreviewModal()">
+                    Close Preview
+                </button>
+                <button class="action-button" onclick="sendFromPreview()">
+                    <i class="fas fa-paper-plane"></i>
+                    Send Email
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Complete customer data with all details
+    const customersData = [
+        { 
+            id: 1, 
+            name: 'Acme Corporation', 
+            code: 'ACM001', 
+            ledger: 'Acme Corp - Sales', 
+            receivable: 1250000, 
+            receipts: 800000, 
+            balance: 450000, 
+            status: 'active',
+            customer_since: 'Jan 15, 2020',
+            primary_contact: 'John Smith',
+            phone: '+91 98765 43210',
+            email: 'accounts@acmecorp.com',
+            address: '123 Business Park, Mumbai, Maharashtra - 400001',
+            gst_number: '27AAACA1234B1Z5',
+            gst_type: 'Regular',
+            state_code: '27 - Maharashtra',
+            gst_reg_date: 'Jan 20, 2020',
+            days_outstanding: 45,
+            credit_limit: 2000000,
+            payment_terms: 30,
+            last_payment_date: 'Aug 15, 2025',
+            last_payment_amount: 125000,
+            pan_uploaded: true,
+            aadhar_uploaded: false,
+            recent_activities: [
+                { description: 'Payment received ₹1,25,000', date: 'Aug 15, 2025' },
+                { description: 'Invoice INV-1247 created', date: 'Aug 12, 2025' },
+                { description: 'GST details updated', date: 'Aug 10, 2025' }
+            ]
+        },
+        { 
+            id: 2, 
+            name: 'Beta Solutions Ltd', 
+            code: 'BET002', 
+            ledger: 'Beta Solutions - Trade', 
+            receivable: 890000, 
+            receipts: 890000, 
+            balance: 0, 
+            status: 'active',
+            customer_since: 'Mar 20, 2020',
+            primary_contact: 'Sarah Johnson',
+            phone: '+91 98765 43211',
+            email: 'finance@betasolutions.com',
+            address: '456 Tech Park, Bangalore, Karnataka - 560001',
+            gst_number: '29BETAB5678C1Z2',
+            gst_type: 'Regular',
+            state_code: '29 - Karnataka',
+            gst_reg_date: 'Mar 25, 2020',
+            days_outstanding: 0,
+            credit_limit: 1500000,
+            payment_terms: 30,
+            last_payment_date: 'Aug 18, 2025',
+            last_payment_amount: 89000,
+            pan_uploaded: true,
+            aadhar_uploaded: true,
+            recent_activities: [
+                { description: 'Full payment received', date: 'Aug 18, 2025' },
+                { description: 'Invoice INV-1189 created', date: 'Aug 15, 2025' }
+            ]
+        },
+        // Add more customers as needed...
+    ];
+
+    // Transaction data for each customer
+    const transactionsData = {
+        1: [
+            { id: 1, date: '2025-08-20', type: 'Invoice', ref: 'INV-1247', description: 'Product Sales', amount: 125000, status: 'Paid' },
+            { id: 2, date: '2025-08-18', type: 'Payment', ref: 'PAY-892', description: 'Payment Received', amount: -80000, status: 'Cleared' },
+            { id: 3, date: '2025-08-15', type: 'Invoice', ref: 'INV-1198', description: 'Service Charges', amount: 45000, status: 'Pending' },
+            { id: 4, date: '2025-08-12', type: 'Credit Note', ref: 'CN-456', description: 'Return Adjustment', amount: -15000, status: 'Applied' },
+        ],
+        2: [
+            { id: 1, date: '2025-08-18', type: 'Payment', ref: 'PAY-901', description: 'Full Settlement', amount: -89000, status: 'Cleared' },
+            { id: 2, date: '2025-08-15', type: 'Invoice', ref: 'INV-1189', description: 'Software License', amount: 89000, status: 'Paid' },
+        ]
+    };
+
+    // Email templates
+    const emailTemplates = {
+        payment_due: {
+            title: 'Payment Due Reminder',
+            subject: 'Payment Reminder - Outstanding Invoice',
+            content: `
+                <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <div style="border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px;">
+                        <h1 style="color: #2563eb; font-size: 24px; margin: 0;">FinanceFlow Solutions</h1>
+                        <p style="color: #6b7280; font-style: italic; margin: 5px 0 0 0;">Your Trusted Financial Partner</p>
+                    </div>
+                    
+                    <h2 style="color: #1f2937; margin-bottom: 20px;">Payment Reminder Notice</h2>
+                    
+                    <p>Dear <strong>{primary_contact}</strong>,</p>
+                    
+                    <p>We hope this email finds you well. This is a friendly reminder regarding the outstanding payment on your account.</p>
+                    
+                    <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2563eb;">
+                        <strong>Customer Details:</strong><br>
+                        Customer Name: {name}<br>
+                        Customer Code: {code}<br>
+                        Outstanding Balance: <span style="color: #dc2626; font-weight: bold; font-size: 18px;">₹{balance}</span><br>
+                        Days Overdue: <span style="background-color: #fef3c7; padding: 2px 8px; border-radius: 4px; font-weight: bold;">{days_outstanding} days</span>
+                    </div>
+                    
+                    <p>We kindly request you to settle the outstanding amount at your earliest convenience. If you have already made the payment, please disregard this notice.</p>
+                    
+                    <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; color: #6b7280; font-size: 14px;">
+                        <p><strong>FinanceFlow Solutions</strong><br>
+                        Finance Department<br>
+                        accounts@financeflow.com | +91 98765 43210</p>
+                    </div>
+                </div>
+            `
+        },
+        cheque_bounce: {
+            title: 'Cheque Return Notice',
+            subject: 'Important: Cheque Return Notification',
+            content: `
+                <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <div style="border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px;">
+                        <h1 style="color: #2563eb; font-size: 24px; margin: 0;">FinanceFlow Solutions</h1>
+                        <p style="color: #6b7280; font-style: italic; margin: 5px 0 0 0;">Your Trusted Financial Partner</p>
+                    </div>
+                    
+                    <h2 style="color: #dc2626; margin-bottom: 20px;">Cheque Return Notification</h2>
+                    
+                    <p>Dear <strong>{primary_contact}</strong>,</p>
+                    
+                    <p>We regret to inform you that the cheque submitted for payment has been returned by the bank.</p>
+                    
+                    <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
+                        <strong>Cheque Details:</strong><br>
+                        Customer Name: {name}<br>
+                        Cheque Number: CHQ-789456<br>
+                        Cheque Amount: <span style="color: #dc2626; font-weight: bold;">₹85,000</span><br>
+                        Return Reason: <span style="background-color: #fef3c7; padding: 2px 8px; border-radius: 4px;">Insufficient Funds</span><br>
+                        Return Date: August 20, 2025
+                    </div>
+                    
+                    <p>Please arrange for immediate payment to avoid further complications.</p>
+                    
+                    <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; color: #6b7280; font-size: 14px;">
+                        <p><strong>FinanceFlow Solutions</strong><br>
+                        Accounts Department<br>
+                        accounts@financeflow.com | +91 98765 43210</p>
+                    </div>
+                </div>
+            `
+        },
+        apology: {
+            title: 'Apology Letter',
+            subject: 'Our Sincere Apologies - Service Disruption',
+            content: `
+                <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <div style="border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px;">
+                        <h1 style="color: #2563eb; font-size: 24px; margin: 0;">FinanceFlow Solutions</h1>
+                        <p style="color: #6b7280; font-style: italic; margin: 5px 0 0 0;">Your Trusted Financial Partner</p>
+                    </div>
+                    
+                    <h2 style="color: #1f2937; margin-bottom: 20px;">Our Sincere Apologies</h2>
+                    
+                    <p>Dear <strong>{primary_contact}</strong>,</p>
+                    
+                    <p>We are writing to sincerely apologize for the recent inconvenience you experienced with our services.</p>
+                    
+                    <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+                        <strong>We value your trust and are committed to providing excellent service.</strong>
+                    </div>
+                    
+                    <p>Thank you for your patience and continued business with us.</p>
+                    
+                    <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; color: #6b7280; font-size: 14px;">
+                        <p><strong>Customer Relations Team</strong><br>
+                        FinanceFlow Solutions<br>
+                        support@financeflow.com | +91 98765 43210</p>
+                    </div>
+                </div>
+            `
+        },
+        msme_confirmation: {
+            title: 'MSME Status Confirmation',
+            subject: 'MSME Registration Status Confirmation',
+            content: `
+                <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <div style="border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px;">
+                        <h1 style="color: #2563eb; font-size: 24px; margin: 0;">FinanceFlow Solutions</h1>
+                        <p style="color: #6b7280; font-style: italic; margin: 5px 0 0 0;">Your Trusted Financial Partner</p>
+                    </div>
+                    
+                    <h2 style="color: #1f2937; margin-bottom: 20px;">MSME Registration Confirmation</h2>
+                    
+                    <p>Dear <strong>{primary_contact}</strong>,</p>
+                    
+                    <p>We are pleased to confirm your MSME registration status and associated benefits.</p>
+                    
+                    <div style="background-color: #ecfdf5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+                        <strong>MSME Benefits:</strong><br>
+                        Extended Payment Terms: 45 days<br>
+                        Priority Support: Enabled<br>
+                        Special Rates: Applicable
+                    </div>
+                    
+                    <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; color: #6b7280; font-size: 14px;">
+                        <p><strong>MSME Relations Department</strong><br>
+                        FinanceFlow Solutions<br>
+                        msme@financeflow.com | +91 98765 43250</p>
+                    </div>
+                </div>
+            `
+        }
+    };
+
+    let filteredData = [...customersData];
+    let currentPage = 1;
+    let pageSize = 10;
+    let totalPages = 1;
+    let currentSort = { column: null, direction: null };
+    let searchTerm = '';
+    let statusFilter = 'all';
+    let currentView = 'list'; // 'list' or 'detail'
+    let selectedCustomer = null;
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        updateTable();
+        setupEventListeners();
+        createCustomerDetailView();
+        createTemplateModals();
+    });
+    
+    function setupEventListeners() {
+        const searchInput = document.getElementById('search-input');
+        const clearSearch = document.getElementById('clear-search');
+        
+        searchInput.addEventListener('input', function() {
+            searchTerm = this.value.toLowerCase();
+            clearSearch.classList.toggle('show', searchTerm.length > 0);
+            currentPage = 1;
+            filterAndUpdateTable();
+        });
+        
+        clearSearch.addEventListener('click', function() {
+            searchInput.value = '';
+            searchTerm = '';
+            this.classList.remove('show');
+            currentPage = 1;
+            filterAndUpdateTable();
+            searchInput.focus();
+        });
+        
+        document.getElementById('status-filter').addEventListener('change', function() {
+            statusFilter = this.value;
+            currentPage = 1;
+            filterAndUpdateTable();
+        });
+        
+        document.querySelectorAll('th.sortable').forEach(header => {
+            header.addEventListener('click', function() {
+                const column = this.dataset.sort;
+                handleSort(column);
+            });
+        });
+    }
+    
+    function createCustomerDetailView() {
+        const detailHTML = `
+            <div class="customer-detail-view" id="customer-detail-view">
+                <div class="max-w-7xl mx-auto px-4 py-6">
+                    <!-- Breadcrumb -->
+                    <nav class="flex items-center gap-2 mb-6 text-sm text-gray-600">
+                        <button onclick="showCustomerList()" class="text-blue-600 hover:underline">← Back to Customers</button>
+                        <span class="text-gray-400">›</span>
+                        <span class="font-medium text-gray-900" id="detail-breadcrumb">Customer Details</span>
+                    </nav>
+
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl">
+                            <div class="text-2xl font-bold" id="detail-receivable">₹0</div>
+                            <div class="text-blue-100">Total Receivable</div>
+                        </div>
+                        <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl">
+                            <div class="text-2xl font-bold" id="detail-receipts">₹0</div>
+                            <div class="text-green-100">Total Receipts</div>
+                        </div>
+                        <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl">
+                            <div class="text-2xl font-bold" id="detail-balance">₹0</div>
+                            <div class="text-purple-100">Outstanding</div>
+                        </div>
+                        <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-xl">
+                            <div class="text-2xl font-bold" id="detail-days">0</div>
+                            <div class="text-orange-100">Days Outstanding</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Main Content -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <!-- Customer Information -->
+                            <div class="bg-white border border-gray-200 rounded-xl p-6">
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                    <i class="fas fa-user text-blue-600 mr-2"></i>
+                                    Customer Information
+                                </h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="customer-info-grid">
+                                    <!-- Info will be populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Contact Details -->
+                            <div class="bg-white border border-gray-200 rounded-xl p-6">
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                    <i class="fas fa-address-book text-green-600 mr-2"></i>
+                                    Contact Details
+                                </h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="contact-info-grid">
+                                    <!-- Contact info will be populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- GST Details -->
+                            <div class="bg-white border border-gray-200 rounded-xl p-6">
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                    <i class="fas fa-file-alt text-purple-600 mr-2"></i>
+                                    GST Details
+                                </h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="gst-info-grid">
+                                    <!-- GST info will be populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Email Templates -->
+                            <div class="bg-white border border-gray-200 rounded-xl p-6">
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                    <i class="fas fa-envelope text-orange-600 mr-2"></i>
+                                    Email Templates
+                                </h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors" onclick="showEmailTemplate('payment_due')">
+                                        <div class="font-semibold text-gray-900 mb-1 flex items-center">
+                                            <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+                                            Payment Due
+                                        </div>
+                                        <div class="text-sm text-gray-600">Send payment reminder</div>
+                                    </div>
+                                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors" onclick="showEmailTemplate('cheque_bounce')">
+                                        <div class="font-semibold text-gray-900 mb-1 flex items-center">
+                                            <i class="fas fa-ban text-red-500 mr-2"></i>
+                                            Cheque Return
+                                        </div>
+                                        <div class="text-sm text-gray-600">Cheque bounce notice</div>
+                                    </div>
+                                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors" onclick="showEmailTemplate('apology')">
+                                        <div class="font-semibold text-gray-900 mb-1 flex items-center">
+                                            <i class="fas fa-heart text-pink-500 mr-2"></i>
+                                            Apology Letter
+                                        </div>
+                                        <div class="text-sm text-gray-600">Service disruption apology</div>
+                                    </div>
+                                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors" onclick="showEmailTemplate('msme_confirmation')">
+                                        <div class="font-semibold text-gray-900 mb-1 flex items-center">
+                                            <i class="fas fa-certificate text-blue-500 mr-2"></i>
+                                            MSME Status
+                                        </div>
+                                        <div class="text-sm text-gray-600">Confirm MSME benefits</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- KYC Documents -->
+                            <div class="bg-white border border-gray-200 rounded-xl p-6">
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                    <i class="fas fa-shield-alt text-indigo-600 mr-2"></i>
+                                    KYC Documents
+                                </h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all" id="pan-upload">
+                                        <i class="fas fa-id-card text-4xl text-gray-400 mb-4"></i>
+                                        <div class="font-semibold text-gray-900">PAN Card</div>
+                                        <div class="text-sm text-gray-600 mt-1">Click to upload</div>
+                                    </div>
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all" id="aadhar-upload">
+                                        <i class="fas fa-address-card text-4xl text-gray-400 mb-4"></i>
+                                        <div class="font-semibold text-gray-900">Aadhar Card</div>
+                                        <div class="text-sm text-gray-600 mt-1">Click to upload</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar -->
+                        <div class="lg:col-span-1 space-y-6">
+                            <!-- Quick Actions -->
+                            <div class="bg-white border border-gray-200 rounded-xl p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                                <div class="space-y-3">
+                                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center" onclick="showTransactionModal()">
+                                        <i class="fas fa-history mr-2"></i>
+                                        View Transactions
+                                    </button>
+                                    <button class="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
+                                        <i class="fas fa-file-pdf mr-2"></i>
+                                        Generate Statement
+                                    </button>
+                                    <button class="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
+                                        <i class="fas fa-paper-plane mr-2"></i>
+                                        Send Reminder
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Recent Activity -->
+                            <div class="bg-white border border-gray-200 rounded-xl p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                                <div id="recent-activity" class="space-y-3">
+                                    <!-- Activities will be populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', detailHTML);
+    }
+
+    function createTemplateModals() {
+        const modalHTML = `
+            <!-- Email Template Modal -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="template-modal">
+                <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-4xl max-h-90vh overflow-hidden">
+                    <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50">
+                        <h3 class="text-xl font-semibold text-gray-900" id="template-title">Email Template</h3>
+                        <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100" onclick="closeTemplateModal()">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 overflow-y-auto max-h-96">
+                        <div class="mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">To:</label>
+                                    <input type="email" id="template-to" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Subject:</label>
+                                    <input type="text" id="template-subject" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg mr-2 transition-colors" onclick="toggleTemplateEdit()">
+                                    <i class="fas fa-edit mr-2"></i>Edit Template
+                                </button>
+                                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors" onclick="previewTemplate()">
+                                    <i class="fas fa-eye mr-2"></i>Preview
+                                </button>
+                            </div>
+                            <div id="template-content" class="border border-gray-300 rounded-lg p-4 min-h-96 bg-white" contenteditable="false">
+                                <!-- Template content will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50">
+                        <button class="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors" onclick="closeTemplateModal()">Cancel</button>
+                        <button class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors" onclick="sendTemplate()">
+                            <i class="fas fa-paper-plane mr-2"></i>Send Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Modal -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="transaction-modal">
+                <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-6xl max-h-90vh overflow-hidden">
+                    <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50">
+                        <h3 class="text-xl font-semibold text-gray-900">Transaction History</h3>
+                        <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100" onclick="closeTransactionModal()">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="bg-gray-50 border-b border-gray-200">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reference</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transaction-table-body" class="divide-y divide-gray-200">
+                                    <!-- Transactions will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+    
+    function filterAndUpdateTable() {
+        showLoading();
+        
+        setTimeout(() => {
+            filteredData = customersData.filter(customer => {
+                const matchesSearch = searchTerm === '' || 
+                    customer.name.toLowerCase().includes(searchTerm) ||
+                    customer.code.toLowerCase().includes(searchTerm) ||
+                    customer.ledger.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
+                
+                return matchesSearch && matchesStatus;
+            });
+            
+            if (currentSort.column) {
+                sortData(currentSort.column, currentSort.direction);
+            }
+            
+            updateTable();
+            hideLoading();
+        }, 300);
+    }
+    
+    function handleSort(column) {
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'asc';
+        }
+        
+        document.querySelectorAll('th.sortable').forEach(header => {
+            header.classList.remove('sorted-asc', 'sorted-desc');
+            if (header.dataset.sort === column) {
+                header.classList.add(`sorted-${currentSort.direction}`);
+            }
+        });
+        
+        sortData(column, currentSort.direction);
+        currentPage = 1;
+        updateTable();
+    }
+    
+    function sortData(column, direction) {
+        filteredData.sort((a, b) => {
+            let valueA, valueB;
+            
+            switch (column) {
+                case 'name':
+                    valueA = a.name.toLowerCase();
+                    valueB = b.name.toLowerCase();
+                    break;
+                case 'ledger':
+                    valueA = a.ledger.toLowerCase();
+                    valueB = b.ledger.toLowerCase();
+                    break;
+                case 'receivable':
+                    valueA = a.receivable;
+                    valueB = b.receivable;
+                    break;
+                case 'receipts':
+                    valueA = a.receipts;
+                    valueB = b.receipts;
+                    break;
+                case 'balance':
+                    valueA = a.balance;
+                    valueB = b.balance;
+                    break;
+                default:
+                    return 0;
+            }
+            
+            if (valueA < valueB) return direction === 'asc' ? -1 : 1;
+            if (valueA > valueB) return direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+    
+    function updateTable() {
+        if (currentView === 'detail') return;
+        
+        totalPages = Math.ceil(filteredData.length / pageSize);
+        if (totalPages === 0) totalPages = 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const pageData = filteredData.slice(startIndex, endIndex);
+        
+        renderTable(pageData, startIndex);
+        updatePagination();
+        updateStats();
+    }
+    
+    function renderTable(data, startIndex) {
+        const tableBody = document.getElementById('table-body');
+        const emptyState = document.getElementById('empty-state');
+        
+        if (data.length === 0) {
+            tableBody.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+        
+        emptyState.style.display = 'none';
+        
+        tableBody.innerHTML = data.map((customer, index) => `
+            <tr>
+                <td class="sl-number">${startIndex + index + 1}</td>
+                <td class="customer-name">
+                    <div class="name">
+                        <button onclick="showCustomerDetail(${customer.id})" class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer text-left">
+                            ${highlightText(customer.name)}
+                        </button>
+                    </div>
+                    <div class="code">${highlightText(customer.code)}</div>
+                </td>
+                <td class="ledger-name">${highlightText(customer.ledger)}</td>
+                <td class="amount ${getAmountClass(customer.receivable)}">${formatCurrency(customer.receivable)}</td>
+                <td class="amount ${getAmountClass(customer.receipts)}">${formatCurrency(customer.receipts)}</td>
+                <td class="amount ${getAmountClass(customer.balance)}">${formatCurrency(customer.balance)}</td>
+                <td>
+                    <span class="status-badge status-${customer.status}">
+                        ${customer.status}
+                    </span>
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    function showCustomerDetail(customerId) {
+        selectedCustomer = customersData.find(c => c.id === customerId);
+        if (!selectedCustomer) return;
+        
+        currentView = 'detail';
+        document.querySelector('.max-w-7xl').style.display = 'none';
+        document.getElementById('customer-detail-view').style.display = 'block';
+        
+        // Update breadcrumb
+        document.getElementById('detail-breadcrumb').textContent = selectedCustomer.name;
+        
+        // Update stats
+        document.getElementById('detail-receivable').textContent = formatCurrency(selectedCustomer.receivable);
+        document.getElementById('detail-receipts').textContent = formatCurrency(selectedCustomer.receipts);
+        document.getElementById('detail-balance').textContent = formatCurrency(selectedCustomer.balance);
+        document.getElementById('detail-days').textContent = selectedCustomer.days_outstanding;
+        
+        // Update customer info
+        updateCustomerInfoGrid();
+        updateKYCStatus();
+        updateRecentActivity();
+    }
+    
+    function showCustomerList() {
+        currentView = 'list';
+        document.getElementById('customer-detail-view').style.display = 'none';
+        document.querySelector('.max-w-7xl').style.display = 'block';
+        selectedCustomer = null;
+    }
+    
+    function updateCustomerInfoGrid() {
+        if (!selectedCustomer) return;
+        
+        const customerInfo = `
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">Customer Name</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.name}</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">Customer Code</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.code}</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">Customer Since</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.customer_since}</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">Ledger Name</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.ledger}</div>
+            </div>
+        `;
+        document.getElementById('customer-info-grid').innerHTML = customerInfo;
+        
+        const contactInfo = `
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">Primary Contact</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.primary_contact}</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">Phone</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.phone}</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">Email</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.email}</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">Address</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.address}</div>
+            </div>
+        `;
+        document.getElementById('contact-info-grid').innerHTML = contactInfo;
+        
+        const gstInfo = `
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">GST Number</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.gst_number}</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">GST Type</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.gst_type}</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">State Code</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.state_code}</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-sm font-medium text-gray-600">Registration Date</div>
+                <div class="font-semibold text-gray-900">${selectedCustomer.gst_reg_date}</div>
+            </div>
+        `;
+        document.getElementById('gst-info-grid').innerHTML = gstInfo;
+    }
+    
+    function updateKYCStatus() {
+        if (!selectedCustomer) return;
+        
+        const panUpload = document.getElementById('pan-upload');
+        const aadharUpload = document.getElementById('aadhar-upload');
+        
+        if (selectedCustomer.pan_uploaded) {
+            panUpload.classList.remove('border-dashed', 'border-gray-300');
+            panUpload.classList.add('border-green-500', 'bg-green-50');
+            panUpload.innerHTML = `
+                <i class="fas fa-check-circle text-4xl text-green-600 mb-4"></i>
+                <div class="font-semibold text-green-900">PAN Card</div>
+                <div class="text-sm text-green-700 mt-1">Uploaded & Verified</div>
+            `;
+        }
+        
+        if (selectedCustomer.aadhar_uploaded) {
+            aadharUpload.classList.remove('border-dashed', 'border-gray-300');
+            aadharUpload.classList.add('border-green-500', 'bg-green-50');
+            aadharUpload.innerHTML = `
+                <i class="fas fa-check-circle text-4xl text-green-600 mb-4"></i>
+                <div class="font-semibold text-green-900">Aadhar Card</div>
+                <div class="text-sm text-green-700 mt-1">Uploaded & Verified</div>
+            `;
+        }
+    }
+    
+    function updateRecentActivity() {
+        if (!selectedCustomer || !selectedCustomer.recent_activities) return;
+        
+        const activityHTML = selectedCustomer.recent_activities.map(activity => `
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                <div class="flex-1">
+                    <div class="text-sm font-medium text-gray-900">${activity.description}</div>
+                    <div class="text-xs text-gray-500 mt-1">${activity.date}</div>
+                </div>
+            </div>
+        `).join('');
+        
+        document.getElementById('recent-activity').innerHTML = activityHTML;
+    }
+    
+    // Email template functions
+    function showEmailTemplate(templateType) {
+        if (!selectedCustomer) return;
+        
+        const template = emailTemplates[templateType];
+        document.getElementById('template-title').textContent = template.title;
+        document.getElementById('template-to').value = selectedCustomer.email;
+        document.getElementById('template-subject').value = template.subject;
+        
+        // Process template with customer data
+        let content = template.content
+            .replace(/{name}/g, selectedCustomer.name)
+            .replace(/{code}/g, selectedCustomer.code)
+            .replace(/{primary_contact}/g, selectedCustomer.primary_contact)
+            .replace(/{balance}/g, selectedCustomer.balance.toLocaleString('en-IN'))
+            .replace(/{days_outstanding}/g, selectedCustomer.days_outstanding);
+        
+        document.getElementById('template-content').innerHTML = content;
+        document.getElementById('template-modal').classList.remove('hidden');
+    }
+    
+    function closeTemplateModal() {
+        document.getElementById('template-modal').classList.add('hidden');
+    }
+    
+    function toggleTemplateEdit() {
+        const content = document.getElementById('template-content');
+        const isEditable = content.contentEditable === 'true';
+        content.contentEditable = !isEditable;
+        
+        if (!isEditable) {
+            content.style.border = '2px solid #3b82f6';
+            content.focus();
+        } else {
+            content.style.border = '1px solid #d1d5db';
+        }
+    }
+    
+    function previewTemplate() {
+        alert('Email preview functionality - template ready for sending!');
+    }
+    
+    function sendTemplate() {
+        const to = document.getElementById('template-to').value;
+        const subject = document.getElementById('template-subject').value;
+        
+        if (confirm(`Send email to ${to}?`)) {
+            setTimeout(() => {
+                alert(`Email sent successfully to ${to}!`);
+                closeTemplateModal();
+            }, 1000);
+        }
+    }
+    
+    // Transaction modal functions
+    function showTransactionModal() {
+        if (!selectedCustomer) return;
+        
+        const transactions = transactionsData[selectedCustomer.id] || [];
+        const tbody = document.getElementById('transaction-table-body');
+        
+        tbody.innerHTML = transactions.map(tx => `
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 text-sm text-gray-900">${formatDate(tx.date)}</td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeClass(tx.type)}">
+                        ${tx.type}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-sm font-mono text-gray-900">${tx.ref}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${tx.description}</td>
+                <td class="px-6 py-4 text-sm text-right font-mono ${tx.amount >= 0 ? 'text-green-600' : 'text-red-600'}">
+                    ₹${Math.abs(tx.amount).toLocaleString('en-IN')}
+                </td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusClass(tx.status)}">
+                        ${tx.status}
+                    </span>
+                </td>
+            </tr>
+        `).join('');
+        
+        document.getElementById('transaction-modal').classList.remove('hidden');
+    }
+    
+    function closeTransactionModal() {
+        document.getElementById('transaction-modal').classList.remove('hidden');
+    }
+    
+    // Utility functions (rest of your existing functions remain the same)
+    function highlightText(text) {
+        if (!searchTerm) return text;
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+    
+    function formatCurrency(amount) {
+        return '₹' + amount.toLocaleString('en-IN');
+    }
+    
+    function getAmountClass(amount) {
+        if (amount > 0) return 'positive';
+        if (amount < 0) return 'negative';
+        return 'zero';
+    }
+    
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-IN', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric' 
+        });
+    }
+    
+    function getTypeClass(type) {
+        const classes = {
+            'Invoice': 'bg-blue-100 text-blue-800',
+            'Payment': 'bg-green-100 text-green-800',
+            'Credit Note': 'bg-yellow-100 text-yellow-800'
+        };
+        return classes[type] || 'bg-gray-100 text-gray-800';
+    }
+    
+    function getStatusClass(status) {
+        const classes = {
+            'Paid': 'bg-green-100 text-green-800',
+            'Pending': 'bg-yellow-100 text-yellow-800',
+            'Overdue': 'bg-red-100 text-red-800',
+            'Cleared': 'bg-blue-100 text-blue-800',
+            'Applied': 'bg-purple-100 text-purple-800'
+        };
+        return classes[status] || 'bg-gray-100 text-gray-800';
+    }
+    
+    function updatePagination() {
+        const paginationInfo = document.getElementById('pagination-info');
+        const pageNumbers = document.getElementById('page-numbers');
+        
+        const startIndex = (currentPage - 1) * pageSize + 1;
+        const endIndex = Math.min(currentPage * pageSize, filteredData.length);
+        
+        paginationInfo.textContent = `Showing ${startIndex}-${endIndex} of ${filteredData.length} customers`;
+        
+        document.getElementById('first-page').disabled = currentPage === 1;
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages;
+        document.getElementById('last-page').disabled = currentPage === totalPages;
+        
+        pageNumbers.innerHTML = generatePageNumbers();
+    }
+    
+    function generatePageNumbers() {
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        
+        let html = '';
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
+        return html;
+    }
+    
+    function updateStats() {
+        document.getElementById('showing-count').textContent = filteredData.length;
+        document.getElementById('total-count').textContent = customersData.length;
+    }
+    
+    function goToPage(page) {
+        if (page >= 1 && page <= totalPages && page !== currentPage) {
+            currentPage = page;
+            updateTable();
+        }
+    }
+    
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('page-size').value);
+        currentPage = 1;
+        updateTable();
+    }
+    
+    function showLoading() {
+        document.getElementById('loading-overlay').classList.add('show');
+    }
+    
+    function hideLoading() {
+        document.getElementById('loading-overlay').classList.remove('show');
+    }
+    
+    function exportData() {
+        const headers = ['SL', 'Customer Name', 'Customer Code', 'Ledger Name', 'Total Receivable', 'Receipts', 'Balance', 'Status'];
+        const csvContent = [
+            headers.join(','),
+            ...filteredData.map((customer, index) => [
+                index + 1,
+                `"${customer.name}"`,
+                customer.code,
+                `"${customer.ledger}"`,
+                customer.receivable,
+                customer.receipts,
+                customer.balance,
+                customer.status
+            ].join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+    
+    // Close modals when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('fixed')) {
+            if (e.target.id === 'template-modal') closeTemplateModal();
+            if (e.target.id === 'transaction-modal') closeTransactionModal();
+        }
+    });
+</script>
+{% endblock %}
+

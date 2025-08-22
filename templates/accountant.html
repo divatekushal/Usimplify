@@ -1,0 +1,654 @@
+{% extends "base.html" %}
+
+{% block title %}Accountant Profile - FinanceFlow{% endblock %}
+{% block page_title %}Accountant Profile{% endblock %}
+{% block page_subtitle %}Professional Account Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f8fafc;
+        color: #334155;
+        line-height: 1.6;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .header-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        background: #3b82f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .profile-info h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.875rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .profile-info p {
+        margin: 0;
+        color: #64748b;
+        font-size: 1rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .status-online {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-offline {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .card-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #3b82f6;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .table th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .table tr:hover td {
+        background: #f8fafc;
+    }
+
+    .company-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .company-item {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .company-item:last-child {
+        border-bottom: none;
+    }
+
+    .company-name {
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .company-meta {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+        font-family: inherit;
+    }
+
+    .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .alert-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Profile Header -->
+    <div class="header-card">
+        <div class="profile-header">
+            <div class="avatar" id="accountant-avatar">AK</div>
+            <div class="profile-info">
+                <h1 id="accountant-name">Amit Kumar</h1>
+                <p id="accountant-designation">Senior Financial Accountant</p>
+                <p id="accountant-id">Employee ID: ACC-2024-001</p>
+            </div>
+            <div class="status-badge status-online" id="status-badge">
+                <span class="status-dot"></span>
+                <span id="status-text">Online</span>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Working Since</span>
+                <span class="info-value" id="working-since">January 15, 2022</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Assigned Date</span>
+                <span class="info-value" id="assigned-date">January 20, 2022</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value">amit.kumar@financeflow.com</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Phone</span>
+                <span class="info-value">+91 98765 43210</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Main Content -->
+        <div>
+            <!-- Companies Managing -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Companies Currently Managing</h2>
+                </div>
+                
+                <ul class="company-list" id="companies-list">
+                    <li class="company-item">
+                        <div>
+                            <div class="company-name">TechNova Solutions Pvt Ltd</div>
+                            <div class="company-meta">Since Mar 2024 • 342 Invoices</div>
+                        </div>
+                    </li>
+                    <li class="company-item">
+                        <div>
+                            <div class="company-name">Green Energy Systems Ltd</div>
+                            <div class="company-meta">Since Jan 2024 • 287 Invoices</div>
+                        </div>
+                    </li>
+                    <li class="company-item">
+                        <div>
+                            <div class="company-name">Metro Construction Co</div>
+                            <div class="company-meta">Since Dec 2023 • 456 Invoices</div>
+                        </div>
+                    </li>
+                    <li class="company-item">
+                        <div>
+                            <div class="company-name">Digital Marketing Hub</div>
+                            <div class="company-meta">Since Oct 2023 • 189 Invoices</div>
+                        </div>
+                    </li>
+                    <li class="company-item">
+                        <div>
+                            <div class="company-name">Alpha Steel Industries</div>
+                            <div class="company-meta">Since Sep 2023 • 623 Invoices</div>
+                        </div>
+                    </li>
+                </ul>
+                
+                <div style="margin-top: 1rem;">
+                    <button class="btn btn-primary" onclick="showAssignForm()">
+                        <i class="fas fa-plus"></i>
+                        Assign New Company
+                    </button>
+                </div>
+
+                <!-- Assign Form (Hidden) -->
+                <div id="assign-form" style="display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+                    <form onsubmit="assignCompany(event)">
+                        <div class="form-group">
+                            <label class="form-label" for="company-name">Company Name</label>
+                            <input type="text" id="company-name" class="form-input" required>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="submit" class="btn btn-primary">Assign</button>
+                            <button type="button" class="btn btn-secondary" onclick="hideAssignForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Login/Logout Activity -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Login/Logout Activity</h2>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Login Time</th>
+                                <th>Logout Time</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Aug 21, 2025</td>
+                                <td>09:15 AM</td>
+                                <td class="text-green-600 font-semibold">Active</td>
+                                <td>8h 20m</td>
+                                <td><span class="status-badge status-online"><span class="status-dot"></span> Online</span></td>
+                            </tr>
+                            <tr>
+                                <td>Aug 20, 2025</td>
+                                <td>09:00 AM</td>
+                                <td>06:30 PM</td>
+                                <td>9h 30m</td>
+                                <td><span style="color: #64748b;">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>Aug 19, 2025</td>
+                                <td>09:15 AM</td>
+                                <td>06:00 PM</td>
+                                <td>8h 45m</td>
+                                <td><span style="color: #64748b;">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>Aug 18, 2025</td>
+                                <td>08:45 AM</td>
+                                <td>05:45 PM</td>
+                                <td>9h 00m</td>
+                                <td><span style="color: #64748b;">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>Aug 17, 2025</td>
+                                <td>09:30 AM</td>
+                                <td>06:15 PM</td>
+                                <td>8h 45m</td>
+                                <td><span style="color: #64748b;">Completed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="companies-count">5</div>
+                    <div class="stat-label">Companies</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="invoices-count">1,897</div>
+                    <div class="stat-label">Invoices Posted</div>
+                </div>
+            </div>
+
+            <!-- Send Message -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Send Message</h3>
+                </div>
+                
+                <div class="alert alert-success" id="message-success" style="display: none;">
+                    Message sent successfully!
+                </div>
+                
+                <form onsubmit="sendMessage(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="message-priority">Priority</label>
+                        <select id="message-priority" class="form-input" required>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="message-text">Message</label>
+                        <textarea id="message-text" class="form-input form-textarea" placeholder="Type your message here..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Message
+                    </button>
+                </form>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Actions</h3>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button class="btn btn-secondary" style="justify-content: center;">
+                        <i class="fas fa-file-alt"></i>
+                        Generate Report
+                    </button>
+                    <button class="btn btn-secondary" style="justify-content: center;">
+                        <i class="fas fa-download"></i>
+                        Export Data
+                    </button>
+                    <button class="btn btn-secondary" style="justify-content: center;">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Accountant data
+    const accountantData = {
+        name: 'Amit Kumar',
+        designation: 'Senior Financial Accountant',
+        id: 'ACC-2024-001',
+        workingSince: 'January 15, 2022',
+        assignedDate: 'January 20, 2022',
+        status: 'online',
+        companiesCount: 5,
+        invoicesCount: 1897
+    };
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePageData();
+    });
+
+    function updatePageData() {
+        // Update basic info
+        document.getElementById('accountant-name').textContent = accountantData.name;
+        document.getElementById('working-since').textContent = accountantData.workingSince;
+        document.getElementById('assigned-date').textContent = accountantData.assignedDate;
+        
+        // Update stats
+        document.getElementById('companies-count').textContent = accountantData.companiesCount;
+        document.getElementById('invoices-count').textContent = accountantData.invoicesCount.toLocaleString();
+        
+        // Update avatar
+        const initials = accountantData.name.split(' ').map(n => n[0]).join('');
+        document.getElementById('accountant-avatar').textContent = initials;
+    }
+
+    function showAssignForm() {
+        document.getElementById('assign-form').style.display = 'block';
+    }
+
+    function hideAssignForm() {
+        document.getElementById('assign-form').style.display = 'none';
+        document.getElementById('company-name').value = '';
+    }
+
+    function assignCompany(event) {
+        event.preventDefault();
+        
+        const companyName = document.getElementById('company-name').value;
+        if (!companyName.trim()) return;
+
+        // Add new company to list
+        const companiesList = document.getElementById('companies-list');
+        const newCompany = document.createElement('li');
+        newCompany.className = 'company-item';
+        newCompany.innerHTML = `
+            <div>
+                <div class="company-name">${companyName}</div>
+                <div class="company-meta">Since ${new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} • 0 Invoices</div>
+            </div>
+        `;
+        companiesList.appendChild(newCompany);
+
+        // Update count
+        accountantData.companiesCount++;
+        document.getElementById('companies-count').textContent = accountantData.companiesCount;
+
+        // Hide form
+        hideAssignForm();
+        alert(`${companyName} has been assigned successfully!`);
+    }
+
+    function sendMessage(event) {
+        event.preventDefault();
+        
+        const priority = document.getElementById('message-priority').value;
+        const messageText = document.getElementById('message-text').value;
+        
+        if (!messageText.trim()) return;
+
+        // Show success message
+        const successAlert = document.getElementById('message-success');
+        successAlert.style.display = 'block';
+        
+        // Clear form
+        document.getElementById('message-priority').value = 'low';
+        document.getElementById('message-text').value = '';
+        
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+            successAlert.style.display = 'none';
+        }, 3000);
+    }
+</script>
+{% endblock %}

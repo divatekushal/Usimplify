@@ -1,0 +1,1339 @@
+{% extends "base.html" %}
+
+{% block title %}Supplier Management - FinanceFlow{% endblock %}
+{% block page_title %}Supplier Management{% endblock %}
+{% block page_subtitle %}Manage supplier relationships and payment details{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f8fafc;
+        color: #374151;
+    }
+
+    .page-header {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .search-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+        min-width: 300px;
+        max-width: 500px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background-color: #ffffff;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        font-size: 1.125rem;
+    }
+
+    .clear-search {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 4px;
+        opacity: 0;
+        transition: all 0.2s ease;
+    }
+
+    .clear-search.show {
+        opacity: 1;
+    }
+
+    .clear-search:hover {
+        background-color: #f3f4f6;
+        color: #374151;
+    }
+
+    .filter-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .filter-select {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-weight: 500;
+        color: #374151;
+        background-color: #ffffff;
+        transition: border-color 0.2s ease;
+        min-width: 120px;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .export-btn {
+        background-color: #2563eb;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .export-btn:hover {
+        background-color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    .table-container {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        margin-bottom: 2rem;
+    }
+
+    .table-header {
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .table-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .table-stats {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        background-color: #f8fafc;
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        border-bottom: 2px solid #e5e7eb;
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .data-table th.sortable {
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        position: relative;
+    }
+
+    .data-table th.sortable:hover {
+        background-color: #f1f5f9;
+    }
+
+    .data-table th.sortable::after {
+        content: '↕';
+        position: absolute;
+        right: 0.5rem;
+        color: #9ca3af;
+        font-size: 0.75rem;
+    }
+
+    .data-table th.sorted-asc::after {
+        content: '↑';
+        color: #2563eb;
+    }
+
+    .data-table th.sorted-desc::after {
+        content: '↓';
+        color: #2563eb;
+    }
+
+    .data-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f3f4f6;
+        color: #374151;
+        font-size: 0.875rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .data-table tr:hover td {
+        background-color: #f9fafb;
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .sl-number {
+        font-weight: 600;
+        color: #6b7280;
+        width: 60px;
+    }
+
+    .supplier-name {
+        font-weight: 600;
+        color: #1f2937;
+        min-width: 200px;
+    }
+
+    .supplier-name .name {
+        font-size: 0.875rem;
+        margin-bottom: 0.125rem;
+    }
+
+    .supplier-name .code {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 400;
+    }
+
+    .ledger-name {
+        color: #374151;
+        min-width: 180px;
+    }
+
+    .amount {
+        font-weight: 600;
+        text-align: right;
+        min-width: 120px;
+        font-family: 'Monaco', 'Menlo', monospace;
+    }
+
+    .amount.positive {
+        color: #059669;
+    }
+
+    .amount.negative {
+        color: #dc2626;
+    }
+
+    .amount.zero {
+        color: #6b7280;
+    }
+
+    .pagination-container {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .pagination-info {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-btn {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        background-color: #ffffff;
+        color: #374151;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        font-weight: 500;
+        min-width: 40px;
+        text-align: center;
+    }
+
+    .page-btn:hover {
+        background-color: #f3f4f6;
+        border-color: #9ca3af;
+    }
+
+    .page-btn.active {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: #ffffff;
+    }
+
+    .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .page-btn:disabled:hover {
+        background-color: #ffffff;
+        border-color: #d1d5db;
+    }
+
+    .page-size-selector {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-size-select {
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        background-color: #ffffff;
+    }
+
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 20;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.show {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #2563eb;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6b7280;
+    }
+
+    .empty-state img {
+        width: 120px;
+        height: 120px;
+        opacity: 0.5;
+        margin: 0 auto 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .highlight {
+        background-color: #fef3c7;
+        padding: 0.125rem 0.25rem;
+        border-radius: 3px;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .search-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .search-box {
+            min-width: auto;
+            max-width: none;
+        }
+        
+        .filter-controls {
+            justify-content: center;
+        }
+        
+        .pagination-container {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .data-table {
+            font-size: 0.75rem;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Page Header with Search -->
+    <div class="page-header">
+        <div class="search-container">
+            <div class="search-box">
+                <div class="search-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <input type="text" 
+                       id="search-input" 
+                       class="search-input" 
+                       placeholder="Search by supplier name or ledger name..."
+                       autocomplete="off">
+                <button class="clear-search" id="clear-search" title="Clear search">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="filter-controls">
+                <select id="balance-filter" class="filter-select">
+                    <option value="all">All Suppliers</option>
+                    <option value="pending">With Balance</option>
+                    <option value="cleared">Fully Paid</option>
+                </select>
+                
+                <button class="export-btn" onclick="exportData()">
+                    <i class="fas fa-download"></i>
+                    Export
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <h3 class="table-title">Supplier Details</h3>
+            <div class="table-stats" id="table-stats">
+                Showing <span id="showing-count">0</span> of <span id="total-count">0</span> suppliers
+            </div>
+        </div>
+        
+        <div style="position: relative; overflow-x: auto;">
+            <div class="loading-overlay" id="loading-overlay">
+                <div class="loading-spinner"></div>
+            </div>
+            
+            <table class="data-table" id="suppliers-table">
+                <thead>
+                    <tr>
+                        <th class="sl-number">SL</th>
+                        <th class="sortable" data-sort="name">Supplier Name</th>
+                        <th class="sortable" data-sort="ledger">Ledger Name</th>
+                        <th class="sortable amount" data-sort="payable">Total Payable</th>
+                        <th class="sortable amount" data-sort="paid">Paid</th>
+                        <th class="sortable amount" data-sort="balance">Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+            
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <img src="/static/images/not-found.png" alt="No suppliers found">
+                <h3>No suppliers found</h3>
+                <p>Try adjusting your search criteria or filters</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="pagination-container">
+        <div class="pagination-info" id="pagination-info">
+            Showing 1-10 of 0 suppliers
+        </div>
+        
+        <div class="pagination-controls" id="pagination-controls">
+            <button class="page-btn" id="first-page" onclick="goToPage(1)">
+                <i class="fas fa-angle-double-left"></i>
+            </button>
+            <button class="page-btn" id="prev-page" onclick="goToPage(currentPage - 1)">
+                <i class="fas fa-angle-left"></i>
+            </button>
+            
+            <div id="page-numbers">
+                <!-- Page numbers will be populated by JavaScript -->
+            </div>
+            
+            <button class="page-btn" id="next-page" onclick="goToPage(currentPage + 1)">
+                <i class="fas fa-angle-right"></i>
+            </button>
+            <button class="page-btn" id="last-page" onclick="goToPage(totalPages)">
+                <i class="fas fa-angle-double-right"></i>
+            </button>
+        </div>
+        
+        <div class="page-size-selector">
+            <label for="page-size" style="font-size: 0.875rem; color: #6b7280;">Show:</label>
+            <select id="page-size" class="page-size-select" onchange="changePageSize()">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Complete supplier data with detailed information
+const suppliersData = [
+    { 
+        id: 1, 
+        name: 'Alpha Steel Industries', 
+        code: 'ASI001', 
+        ledger: 'Alpha Steel - Raw Materials', 
+        payable: 1250000, 
+        paid: 850000, 
+        balance: 400000,
+        since: 'March 15, 2020',
+        contact_person: 'Rajesh Kumar',
+        phone: '+91 98765 43210',
+        email: 'rajesh@alphasteel.com',
+        address: '123 Industrial Area, Sector 45, Gurugram, Haryana - 122003',
+        gst_number: '06AAACA1234B1Z5',
+        total_orders: 48,
+        orders: [
+            { id: 'PO001', date: '2025-08-15', description: 'Steel Rods & Plates', amount: 125000, status: 'completed' },
+            { id: 'PO002', date: '2025-08-10', description: 'Raw Material Supply', amount: 89000, status: 'processing' },
+            { id: 'PO003', date: '2025-08-05', description: 'Industrial Hardware', amount: 156000, status: 'pending' },
+            { id: 'PO004', date: '2025-07-28', description: 'Steel Fabrication', amount: 234000, status: 'completed' },
+            { id: 'PO005', date: '2025-07-20', description: 'Construction Materials', amount: 178000, status: 'completed' }
+        ],
+        services: [
+            {
+                title: 'Raw Material Supply',
+                description: 'High-quality steel, iron, and metal components for manufacturing processes.',
+                icon: 'fas fa-industry'
+            },
+            {
+                title: 'Custom Fabrication',
+                description: 'Specialized steel cutting, welding, and fabrication services as per specifications.',
+                icon: 'fas fa-tools'
+            },
+            {
+                title: 'Quality Testing',
+                description: 'Material testing and quality assurance with certified reports.',
+                icon: 'fas fa-certificate'
+            }
+        ]
+    },
+    { 
+        id: 2, 
+        name: 'Beta Electronics Ltd', 
+        code: 'BEL002', 
+        ledger: 'Beta Electronics - Components', 
+        payable: 890000, 
+        paid: 890000, 
+        balance: 0,
+        since: 'June 10, 2020',
+        contact_person: 'Priya Sharma',
+        phone: '+91 98765 43211',
+        email: 'priya@betaelectronics.com',
+        address: '456 Electronic City, Phase 2, Bangalore, Karnataka - 560100',
+        gst_number: '29BETAB5678C1Z2',
+        total_orders: 32,
+        orders: [
+            { id: 'PO021', date: '2025-08-18', description: 'Electronic Components', amount: 95000, status: 'completed' },
+            { id: 'PO022', date: '2025-08-12', description: 'PCB Boards', amount: 78000, status: 'completed' },
+            { id: 'PO023', date: '2025-08-06', description: 'Semiconductors', amount: 145000, status: 'completed' },
+            { id: 'PO024', date: '2025-07-30', description: 'Circuit Components', amount: 123000, status: 'completed' }
+        ],
+        services: [
+            {
+                title: 'Electronic Components',
+                description: 'Wide range of electronic components including resistors, capacitors, and ICs.',
+                icon: 'fas fa-microchip'
+            },
+            {
+                title: 'PCB Manufacturing',
+                description: 'Custom PCB design and manufacturing with quick turnaround times.',
+                icon: 'fas fa-circuit-board'
+            },
+            {
+                title: 'Technical Support',
+                description: '24/7 technical support and consultation for electronic projects.',
+                icon: 'fas fa-headset'
+            }
+        ]
+    },
+    // Add more suppliers with similar structure...
+    { 
+        id: 3, 
+        name: 'Gamma Chemicals Pvt Ltd', 
+        code: 'GCP003', 
+        ledger: 'Gamma Chemicals - Supplies', 
+        payable: 2100000, 
+        paid: 1500000, 
+        balance: 600000,
+        since: 'January 5, 2021',
+        contact_person: 'Amit Patel',
+        phone: '+91 98765 43212',
+        email: 'amit@gammachemicals.com',
+        address: '789 Chemical Complex, GIDC, Vadodara, Gujarat - 391340',
+        gst_number: '24GAMMA1234D1Z3',
+        total_orders: 25,
+        orders: [
+            { id: 'PO031', date: '2025-08-16', description: 'Industrial Chemicals', amount: 185000, status: 'completed' },
+            { id: 'PO032', date: '2025-08-08', description: 'Laboratory Reagents', amount: 95000, status: 'processing' },
+            { id: 'PO033', date: '2025-07-25', description: 'Safety Chemicals', amount: 125000, status: 'pending' }
+        ],
+        services: [
+            {
+                title: 'Industrial Chemicals',
+                description: 'High-grade industrial chemicals for manufacturing and processing.',
+                icon: 'fas fa-flask'
+            },
+            {
+                title: 'Laboratory Supplies',
+                description: 'Laboratory reagents and analytical grade chemicals.',
+                icon: 'fas fa-microscope'
+            },
+            {
+                title: 'Safety & Compliance',
+                description: 'Safety training and regulatory compliance support.',
+                icon: 'fas fa-shield-alt'
+            }
+        ]
+    }
+];
+
+let filteredData = [...suppliersData];
+let currentPage = 1;
+let pageSize = 10;
+let totalPages = 1;
+let currentSort = { column: null, direction: null };
+let searchTerm = '';
+let balanceFilter = 'all';
+let currentView = 'list'; // 'list' or 'detail'
+let selectedSupplier = null;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    updateTable();
+    setupEventListeners();
+    createSupplierDetailView();
+});
+
+function setupEventListeners() {
+    const searchInput = document.getElementById('search-input');
+    const clearSearch = document.getElementById('clear-search');
+    
+    searchInput.addEventListener('input', function() {
+        searchTerm = this.value.toLowerCase();
+        clearSearch.classList.toggle('show', searchTerm.length > 0);
+        currentPage = 1;
+        filterAndUpdateTable();
+    });
+    
+    clearSearch.addEventListener('click', function() {
+        searchInput.value = '';
+        searchTerm = '';
+        this.classList.remove('show');
+        currentPage = 1;
+        filterAndUpdateTable();
+        searchInput.focus();
+    });
+    
+    document.getElementById('balance-filter').addEventListener('change', function() {
+        balanceFilter = this.value;
+        currentPage = 1;
+        filterAndUpdateTable();
+    });
+    
+    document.querySelectorAll('th.sortable').forEach(header => {
+        header.addEventListener('click', function() {
+            const column = this.dataset.sort;
+            handleSort(column);
+        });
+    });
+}
+
+function createSupplierDetailView() {
+    const detailHTML = `
+        <div class="supplier-detail-view" id="supplier-detail-view" style="display: none;">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <!-- Breadcrumb -->
+                <nav class="flex items-center gap-2 mb-6 text-sm text-gray-600">
+                    <button onclick="showSupplierList()" class="text-blue-600 hover:underline font-semibold">← Back to Suppliers</button>
+                    <span class="text-gray-400">›</span>
+                    <span class="font-medium text-gray-900" id="detail-breadcrumb">Supplier Details</span>
+                </nav>
+
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg">
+                        <div class="text-2xl font-bold" id="detail-orders">0</div>
+                        <div class="text-blue-100">Total Orders</div>
+                    </div>
+                    <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-xl shadow-lg">
+                        <div class="text-2xl font-bold" id="detail-payable">₹0</div>
+                        <div class="text-red-100">Total Payable</div>
+                    </div>
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg">
+                        <div class="text-2xl font-bold" id="detail-paid">₹0</div>
+                        <div class="text-green-100">Amount Paid</div>
+                    </div>
+                    <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-xl shadow-lg">
+                        <div class="text-2xl font-bold" id="detail-balance">₹0</div>
+                        <div class="text-orange-100">Balance Due</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Main Content -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Supplier Information -->
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-building text-blue-600 mr-3"></i>
+                                Supplier Information
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="supplier-info-grid">
+                                <!-- Info will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Recent Orders -->
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-shopping-cart text-green-600 mr-3"></i>
+                                Recent Orders
+                            </h2>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr class="bg-gray-50 border-b">
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="orders-tbody" class="divide-y divide-gray-200">
+                                        <!-- Orders will be populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Services & Goods -->
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-boxes text-purple-600 mr-3"></i>
+                                Supplied Goods & Services
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="services-grid">
+                                <!-- Services will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Contact Information -->
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-address-book text-green-600 mr-3"></i>
+                                Contact Information
+                            </h3>
+                            <div id="contact-info" class="space-y-3">
+                                <!-- Contact info will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Query Form -->
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <i class="fas fa-question-circle text-orange-600 mr-3"></i>
+                                Contact Accountant
+                            </h3>
+                            
+                            <div id="query-success" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 hidden">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Your query has been sent successfully!
+                            </div>
+                            
+                            <form onsubmit="submitQuery(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Issue Type</label>
+                                    <select id="query-subject" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="">Select Issue Type</option>
+                                        <option value="payment">Payment Discrepancy</option>
+                                        <option value="invoice">Invoice Query</option>
+                                        <option value="delivery">Delivery Issue</option>
+                                        <option value="quality">Quality Concern</option>
+                                        <option value="pricing">Pricing Inquiry</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                                    <select id="query-priority" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="low">Low</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                                    <textarea id="query-message" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Describe your issue in detail..." required></textarea>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                                        <i class="fas fa-paper-plane mr-2"></i>Send Query
+                                    </button>
+                                    <button type="button" onclick="clearQueryForm()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                                        Clear
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                            <div class="space-y-3">
+                                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                                    <i class="fas fa-file-invoice mr-2"></i>Generate Statement
+                                </button>
+                                <button class="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                                    <i class="fas fa-download mr-2"></i>Download Reports
+                                </button>
+                                <button class="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                                    <i class="fas fa-edit mr-2"></i>Edit Supplier
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', detailHTML);
+}
+
+function showSupplierDetail(supplierId) {
+    selectedSupplier = suppliersData.find(s => s.id === supplierId);
+    if (!selectedSupplier) return;
+    
+    currentView = 'detail';
+    document.querySelector('.max-w-7xl').style.display = 'none';
+    document.getElementById('supplier-detail-view').style.display = 'block';
+    
+    // Update breadcrumb
+    document.getElementById('detail-breadcrumb').textContent = selectedSupplier.name;
+    
+    // Update stats
+    document.getElementById('detail-orders').textContent = selectedSupplier.total_orders;
+    document.getElementById('detail-payable').textContent = formatCurrency(selectedSupplier.payable);
+    document.getElementById('detail-paid').textContent = formatCurrency(selectedSupplier.paid);
+    document.getElementById('detail-balance').textContent = formatCurrency(selectedSupplier.balance);
+    
+    // Update supplier info
+    updateSupplierInfoGrid();
+    updateOrdersTable();
+    updateServicesGrid();
+    updateContactInfo();
+}
+
+function showSupplierList() {
+    currentView = 'list';
+    document.getElementById('supplier-detail-view').style.display = 'none';
+    document.querySelector('.max-w-7xl').style.display = 'block';
+    selectedSupplier = null;
+}
+
+function updateSupplierInfoGrid() {
+    if (!selectedSupplier) return;
+    
+    const supplierInfo = `
+        <div class="space-y-1">
+            <div class="text-sm font-medium text-gray-600">Supplier Name</div>
+            <div class="font-semibold text-gray-900">${selectedSupplier.name}</div>
+        </div>
+        <div class="space-y-1">
+            <div class="text-sm font-medium text-gray-600">Supplier Code</div>
+            <div class="font-semibold text-gray-900">${selectedSupplier.code}</div>
+        </div>
+        <div class="space-y-1">
+            <div class="text-sm font-medium text-gray-600">Supplier Since</div>
+            <div class="font-semibold text-gray-900">${selectedSupplier.since}</div>
+        </div>
+        <div class="space-y-1">
+            <div class="text-sm font-medium text-gray-600">Ledger Name</div>
+            <div class="font-semibold text-gray-900">${selectedSupplier.ledger}</div>
+        </div>
+        <div class="space-y-1">
+            <div class="text-sm font-medium text-gray-600">GST Number</div>
+            <div class="font-semibold text-gray-900">${selectedSupplier.gst_number}</div>
+        </div>
+        <div class="space-y-1">
+            <div class="text-sm font-medium text-gray-600">Outstanding Balance</div>
+            <div class="font-semibold text-gray-900 ${getAmountClass(selectedSupplier.balance)}">${formatCurrency(selectedSupplier.balance)}</div>
+        </div>
+    `;
+    document.getElementById('supplier-info-grid').innerHTML = supplierInfo;
+}
+
+function updateOrdersTable() {
+    if (!selectedSupplier) return;
+    
+    const ordersHTML = selectedSupplier.orders.map(order => `
+        <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 font-mono text-sm">${order.id}</td>
+            <td class="px-4 py-3 text-sm">${formatDate(order.date)}</td>
+            <td class="px-4 py-3 text-sm">${order.description}</td>
+            <td class="px-4 py-3 text-sm text-right font-mono">${formatCurrency(order.amount)}</td>
+            <td class="px-4 py-3">
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusClass(order.status)}">
+                    ${order.status}
+                </span>
+            </td>
+        </tr>
+    `).join('');
+    
+    document.getElementById('orders-tbody').innerHTML = ordersHTML;
+}
+
+function updateServicesGrid() {
+    if (!selectedSupplier) return;
+    
+    const servicesHTML = selectedSupplier.services.map(service => `
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div class="flex items-center mb-2">
+                <i class="${service.icon} text-blue-600 text-xl mr-3"></i>
+                <h4 class="font-semibold text-gray-900">${service.title}</h4>
+            </div>
+            <p class="text-sm text-gray-600">${service.description}</p>
+        </div>
+    `).join('');
+    
+    document.getElementById('services-grid').innerHTML = servicesHTML;
+}
+
+function updateContactInfo() {
+    if (!selectedSupplier) return;
+    
+    const contactHTML = `
+        <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-user text-blue-600"></i>
+            </div>
+            <div>
+                <div class="font-semibold text-gray-900">${selectedSupplier.contact_person}</div>
+                <div class="text-sm text-gray-600">Contact Person</div>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-phone text-green-600"></i>
+            </div>
+            <div>
+                <div class="font-semibold text-gray-900">
+                    <a href="tel:${selectedSupplier.phone}" class="hover:text-blue-600">${selectedSupplier.phone}</a>
+                </div>
+                <div class="text-sm text-gray-600">Phone Number</div>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-envelope text-purple-600"></i>
+            </div>
+            <div>
+                <div class="font-semibold text-gray-900">
+                    <a href="mailto:${selectedSupplier.email}" class="hover:text-blue-600">${selectedSupplier.email}</a>
+                </div>
+                <div class="text-sm text-gray-600">Email Address</div>
+            </div>
+        </div>
+        
+        <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+            <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mt-1">
+                <i class="fas fa-map-marker-alt text-orange-600"></i>
+            </div>
+            <div>
+                <div class="font-semibold text-gray-900">${selectedSupplier.address}</div>
+                <div class="text-sm text-gray-600">Address</div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('contact-info').innerHTML = contactHTML;
+}
+
+function submitQuery(event) {
+    event.preventDefault();
+    
+    const subject = document.getElementById('query-subject').value;
+    const priority = document.getElementById('query-priority').value;
+    const message = document.getElementById('query-message').value;
+    
+    if (!subject || !message.trim()) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    // Show success message
+    document.getElementById('query-success').classList.remove('hidden');
+    
+    // Clear form
+    clearQueryForm();
+    
+    // Hide success message after 5 seconds
+    setTimeout(() => {
+        document.getElementById('query-success').classList.add('hidden');
+    }, 5000);
+}
+
+function clearQueryForm() {
+    document.getElementById('query-subject').value = '';
+    document.getElementById('query-priority').value = 'medium';
+    document.getElementById('query-message').value = '';
+}
+
+function getStatusClass(status) {
+    const classes = {
+        'completed': 'bg-green-100 text-green-800',
+        'processing': 'bg-blue-100 text-blue-800',
+        'pending': 'bg-yellow-100 text-yellow-800',
+        'cancelled': 'bg-red-100 text-red-800'
+    };
+    return classes[status] || 'bg-gray-100 text-gray-800';
+}
+
+// Update the existing renderTable function to include clickable supplier names:
+function renderTable(data, startIndex) {
+    const tableBody = document.getElementById('table-body');
+    const emptyState = document.getElementById('empty-state');
+    
+    if (data.length === 0) {
+        tableBody.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    
+    tableBody.innerHTML = data.map((supplier, index) => `
+        <tr>
+            <td class="sl-number">${startIndex + index + 1}</td>
+            <td class="supplier-name">
+                <div class="name">
+                    <a href="/supplier/${supplier.id}" class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer font-semibold">
+                        ${highlightText(supplier.name)}
+                    </a>
+                </div>
+                <div class="code">${highlightText(supplier.code)}</div>
+            </td>
+            <td class="ledger-name">${highlightText(supplier.ledger)}</td>
+            <td class="amount ${getAmountClass(supplier.payable)}">${formatCurrency(supplier.payable)}</td>
+            <td class="amount ${getAmountClass(supplier.paid)}">${formatCurrency(supplier.paid)}</td>
+            <td class="amount ${getAmountClass(supplier.balance)}">${formatCurrency(supplier.balance)}</td>
+        </tr>
+    `).join('');
+}
+
+
+// Keep all your existing utility functions
+function filterAndUpdateTable() {
+    showLoading();
+    
+    setTimeout(() => {
+        filteredData = suppliersData.filter(supplier => {
+            const matchesSearch = searchTerm === '' || 
+                supplier.name.toLowerCase().includes(searchTerm) ||
+                supplier.code.toLowerCase().includes(searchTerm) ||
+                supplier.ledger.toLowerCase().includes(searchTerm);
+            
+            let matchesBalance = true;
+            if (balanceFilter === 'pending') {
+                matchesBalance = supplier.balance > 0;
+            } else if (balanceFilter === 'cleared') {
+                matchesBalance = supplier.balance === 0;
+            }
+            
+            return matchesSearch && matchesBalance;
+        });
+        
+        if (currentSort.column) {
+            sortData(currentSort.column, currentSort.direction);
+        }
+        
+        updateTable();
+        hideLoading();
+    }, 300);
+}
+
+// Keep all other existing functions (handleSort, sortData, updateTable, updatePagination, etc.)
+// ... [All your existing utility functions remain the same]
+
+function highlightText(text) {
+    if (!searchTerm) return text;
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    return text.replace(regex, '<span class="highlight">$1</span>');
+}
+
+function formatCurrency(amount) {
+    return '₹' + amount.toLocaleString('en-IN');
+}
+
+function getAmountClass(amount) {
+    if (amount > 0) return 'positive';
+    if (amount < 0) return 'negative';
+    return 'zero';
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-IN', { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric' 
+    });
+}
+
+function updateTable() {
+    if (currentView === 'detail') return;
+    
+    totalPages = Math.ceil(filteredData.length / pageSize);
+    if (totalPages === 0) totalPages = 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const pageData = filteredData.slice(startIndex, endIndex);
+    
+    renderTable(pageData, startIndex);
+    updatePagination();
+    updateStats();
+}
+
+function updatePagination() {
+    const paginationInfo = document.getElementById('pagination-info');
+    const pageNumbers = document.getElementById('page-numbers');
+    
+    const startIndex = (currentPage - 1) * pageSize + 1;
+    const endIndex = Math.min(currentPage * pageSize, filteredData.length);
+    
+    paginationInfo.textContent = `Showing ${startIndex}-${endIndex} of ${filteredData.length} suppliers`;
+    
+    document.getElementById('first-page').disabled = currentPage === 1;
+    document.getElementById('prev-page').disabled = currentPage === 1;
+    document.getElementById('next-page').disabled = currentPage === totalPages;
+    document.getElementById('last-page').disabled = currentPage === totalPages;
+    
+    pageNumbers.innerHTML = generatePageNumbers();
+}
+
+function generatePageNumbers() {
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    let html = '';
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    }
+    return html;
+}
+
+function updateStats() {
+    document.getElementById('showing-count').textContent = filteredData.length;
+    document.getElementById('total-count').textContent = suppliersData.length;
+}
+
+function goToPage(page) {
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+        currentPage = page;
+        updateTable();
+    }
+}
+
+function changePageSize() {
+    pageSize = parseInt(document.getElementById('page-size').value);
+    currentPage = 1;
+    updateTable();
+}
+
+function showLoading() {
+    document.getElementById('loading-overlay').classList.add('show');
+}
+
+function hideLoading() {
+    document.getElementById('loading-overlay').classList.remove('show');
+}
+
+function handleSort(column) {
+    if (currentSort.column === column) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSort.column = column;
+        currentSort.direction = 'asc';
+    }
+    
+    document.querySelectorAll('th.sortable').forEach(header => {
+        header.classList.remove('sorted-asc', 'sorted-desc');
+        if (header.dataset.sort === column) {
+            header.classList.add(`sorted-${currentSort.direction}`);
+        }
+    });
+    
+    sortData(column, currentSort.direction);
+    currentPage = 1;
+    updateTable();
+}
+
+function sortData(column, direction) {
+    filteredData.sort((a, b) => {
+        let valueA, valueB;
+        
+        switch (column) {
+            case 'name':
+                valueA = a.name.toLowerCase();
+                valueB = b.name.toLowerCase();
+                break;
+            case 'ledger':
+                valueA = a.ledger.toLowerCase();
+                valueB = b.ledger.toLowerCase();
+                break;
+            case 'payable':
+                valueA = a.payable;
+                valueB = b.payable;
+                break;
+            case 'paid':
+                valueA = a.paid;
+                valueB = b.paid;
+                break;
+            case 'balance':
+                valueA = a.balance;
+                valueB = b.balance;
+                break;
+            default:
+                return 0;
+        }
+        
+        if (valueA < valueB) return direction === 'asc' ? -1 : 1;
+        if (valueA > valueB) return direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+}
+
+function exportData() {
+    const headers = ['SL', 'Supplier Name', 'Supplier Code', 'Ledger Name', 'Total Payable', 'Paid', 'Balance'];
+    const csvContent = [
+        headers.join(','),
+        ...filteredData.map((supplier, index) => [
+            index + 1,
+            `"${supplier.name}"`,
+            supplier.code,
+            `"${supplier.ledger}"`,
+            supplier.payable,
+            supplier.paid,
+            supplier.balance
+        ].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `suppliers_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+</script>
+{% endblock %}
