@@ -24,7 +24,7 @@ def get_current_user(token: str = Depends(security), db: Session = Depends(get_d
     return user
 
 def require_owner(current_user: User = Depends(get_current_user)):
-    if current_user.role != "owner":
+    if current_user.role != "OWNER":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only owners can access this resource"
