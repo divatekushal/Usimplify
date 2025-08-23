@@ -125,7 +125,7 @@ async def transactions(request: Request):
 async def bank(request: Request):
     """Bank management page"""
     bank_data = {
-        "banks": [
+        "banks": [  
             {
                 "id": "hdfc",
                 "name": "HDFC Bank", 
