@@ -27,7 +27,7 @@ def get_companies(
     db: Session = Depends(get_db), 
     current_user: User = Depends(get_current_user)
 ):
-    if current_user.role == "owner":
+    if current_user.role == "OWNER":
         return db.query(Company).all()
     else:
         # Return only companies assigned to this accountant
@@ -96,7 +96,7 @@ def assign_accountant_to_companies(
     # Verify accountant exists
     accountant = db.query(User).filter(
         User.id == request.user_id, 
-        User.role == "accountant"
+        User.role == "ACCOUNTANT"
     ).first()
     if not accountant:
         raise HTTPException(
