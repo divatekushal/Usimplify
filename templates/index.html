@@ -146,11 +146,9 @@
                     </div>
                     
                     <div class="flex items-center space-x-4">
-                        <button class="text-slate-600 hover:text-blue-600 font-medium transition-colors">
-                            Sign In
-                        </button>
+
                         <button class="btn-primary text-white px-6 py-2.5 rounded-xl font-medium">
-                            Start Trial
+                            Sign In
                         </button>
                     </div>
                 </div>
@@ -1341,11 +1339,7 @@
                         </button>
                     </div>
 
-                    <!-- Switch to Signup -->
-                    <p class="mt-6 text-center text-sm text-slate-600">
-                        Don't have an account? 
-                        <button type="button" id="switch-to-signup" class="text-blue-600 hover:text-blue-500 font-medium">Create one</button>
-                    </p>
+
                 </form>
 
                 <!-- Signup Form -->
@@ -1572,10 +1566,8 @@
             this.closeBtn = document.getElementById('close-popup');
             
             this.loginForm = document.getElementById('login-form');
-            this.signupForm = document.getElementById('signup-form');
             this.successMessage = document.getElementById('success-message');
             
-            this.switchToSignup = document.getElementById('switch-to-signup');
             this.switchToLogin = document.getElementById('switch-to-login');
             
             this.popupTitle = document.getElementById('popup-title');
@@ -1600,7 +1592,6 @@
             
             // Form submissions
             this.loginForm.addEventListener('submit', (e) => this.handleLogin(e));
-            this.signupForm.addEventListener('submit', (e) => this.handleSignup(e));
             
             // Password toggle functionality
             this.setupPasswordToggles();
@@ -1713,12 +1704,10 @@
             
             if (type === 'login') {
                 this.loginForm.classList.add('active');
-                this.signupForm.classList.remove('active');
                 this.popupTitle.textContent = 'Welcome Back';
                 this.popupSubtitle.textContent = 'Sign in to your account';
             } else {
-                this.signupForm.classList.add('active');
-                this.loginForm.classList.remove('active');
+                this.loginForm.classList.add('active');
                 this.popupTitle.textContent = 'Get Started';
                 this.popupSubtitle.textContent = 'Create your account';
             }
@@ -1740,7 +1729,7 @@
         
         async handleSignup(e) {
             e.preventDefault();
-            const btn = this.signupForm.querySelector('button[type="submit"]');
+            const btn = this.loginForm.querySelector('button[type="submit"]');
             this.setLoadingState(btn, true);
             
             // Simulate API call
@@ -1863,7 +1852,6 @@
         
         resetForms() {
             this.loginForm.reset();
-            this.signupForm.reset();
             this.successMessage.style.display = 'none';
             
             document.querySelectorAll('.auth-form').forEach(form => {
@@ -1871,7 +1859,6 @@
             });
             
             this.loginForm.classList.add('active');
-            this.signupForm.classList.remove('active');
             
             // Clear all errors
             document.querySelectorAll('.form-input.error').forEach(input => {
